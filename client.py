@@ -11,6 +11,8 @@ def my_quit():
 def import_products_and_categories_from_FakeStoreApi():
     products = get_products_from_FakeStoreApi()
     categories = get_categories_from_FakeStoreApi()
+    #TODO: check if we already have these products / categories in the database
+    #TODO: each product / category not already in database should be saved in database
 
 
 def main():
