@@ -1,4 +1,3 @@
-"""Customer validation models."""
 from pydantic import BaseModel, Field
 from pydantic.types import StringConstraints
 from pydantic import ConfigDict, EmailStr
