@@ -18,18 +18,21 @@ def imported_products_to_db(api_products):
         name = data.get('title') #naming convention from ER-diagram
         price = data.get('price')
         category = data.get('category')
-        stock_from_API = 10 #there's no stock in the fake store, how to deal with this?
+        default_stock = 10 #there's no stock in the fake store, how to deal with this?
 
         cursor.execute("SELECT product_id, stock FROM products WHERE name = ?", (name,))
         existing_product = cursor.fetchone()
 
         if existing_product: #already existing product
-            new_stock = existing_product['stock'] + stock_from_API
+            print(f"{name} already exists")
+            
+            """ new_stock = existing_product['stock'] + default_stock
             cursor.execute("UPDATE products SET stock = ? WHERE id = ?", (new_stock, existing_product["id"]))
-            updated_count += 1
+            updated_count += 1 """
+
         else: #not already existing product
             cursor.execute("INSERT INTO products (name, price, category_id, stock) VALUES (?, ?, ?, ?)",
-                (name, price, category, stock_from_API)
+                (name, price, category, default_stock)
             )
             imported += 1
 
