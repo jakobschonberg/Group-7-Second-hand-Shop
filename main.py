@@ -6,6 +6,7 @@ from os import getenv, path as osPath
 from fastapi import Header, Depends
 from json import load, dump
 from models import Product, Category
+from functools import cmp_to_key
 
 app = FastAPI()
 
@@ -17,19 +18,31 @@ def lowercase(obj):
 def get_categories_from_database():
     #TODO: remove this placeholder function
     categories = [{"name": "Clothings", "category_id": 1},
-        {"name": "Electronics", "category_id": 2}]
+        {"name": "Electronics", "category_id": 2},
+        {"name": "Shoes", "category_id": 3}]
     return categories
 
 def get_products_from_database():
     #TODO: remove this placeholder function
     products = [{"product_id": 2, "name": "T-shirt, white", "price": 99.99, "stock": 25, "category_id":1},
-        {"product_id": 1, "name": "USB stick 16 GB", "price": 119, "stock": 22, "category_id":2}]
+        {"product_id": 3, "name": "Sneakers, size: 49", "price": 1300, "stock": 1, "category_id": 3},
+        {"product_id": 1, "name": "USB stick 16 GB", "price": 119, "stock": 0, "category_id":2}]
     return products
 
 categories = get_categories_from_database()
 products = get_products_from_database()
 print(products)
 print(categories)
+
+def products_compared_by_category(x: dict, y: dict):
+    x_category = next((category for category in categories if x["category_id"] == category["category_id"]), None)
+    y_category = next((category for category in categories if y["category_id"] == category["category_id"]), None)
+    print(x_category["name"], y_category["name"], x_category["name"] < y_category["name"])
+    if x_category["name"] < y_category["name"]:
+        return -1
+    if x_category["name"] > y_category["name"]:
+        return 1
+    return 0
 
 @app.get("/products")
 def get_products(name: str | None = Query(default=None, min_length=2),
@@ -53,7 +66,11 @@ def get_products(name: str | None = Query(default=None, min_length=2),
         rproducts = [product for product in rproducts if product["price"] <= maximum_price]
     if in_stock:
         rproducts = [product for product in rproducts if product["stock"] >= 1]
-    sorted_products = sorted(rproducts, key=lambda m: lowercase(m[sort_by]), reverse=(order == "desc"))
+    sorted_products = []
+    if sort_by == "category":
+        sorted_products = sorted(rproducts, key=cmp_to_key(products_compared_by_category), reverse=(order == "desc"))
+    else:
+        sorted_products = sorted(rproducts, key=lambda m: lowercase(m[sort_by]), reverse=(order == "desc"))
     total = len(sorted_products)
     page = sorted_products[offset:offset + limit]
     return {"total": total, "limit": limit, "offset": offset, "products": page}
@@ -61,7 +78,7 @@ def get_products(name: str | None = Query(default=None, min_length=2),
 
 @app.get("/products/{product_id}")
 def get_product(product_id: int = FastApiPath(ge=0)):
-    found_product = next((product for product in products if product["id"] == product_id), None)
+    found_product = next((product for product in products if product["product_id"] == product_id), None)
     if found_product:
         return found_product
     raise HTTPException(status_code=404, detail="product not found")
