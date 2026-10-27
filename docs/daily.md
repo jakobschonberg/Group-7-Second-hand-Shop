@@ -21,5 +21,4 @@ Import from products #13 finished, need review. Started a new issue: "View produ
 
 Yetnayet: 
 Managing customer task, validation and routes. 
-
 Questions: should we add functionality to update products or manually add/delete etc.
