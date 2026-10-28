@@ -58,7 +58,9 @@ def remove_customer(customer_id: int = Path(gt=0)):
     try:
         deleted = database.delete_customer(customer_id)
     except (ValueError, sqlite3.IntegrityError) as error:
-        raise HTTPException(409, "Customer has related records") from error
+        raise HTTPException(
+            409, "Cannot delete customer because related records exist"
+        ) from error
     if not deleted:
         raise HTTPException(404, "Customer not found")
     return Response(status_code=204)
