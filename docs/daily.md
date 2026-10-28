@@ -22,3 +22,16 @@ Import from products #13 finished, need review. Started a new issue: "View produ
 Yetnayet: 
 Managing customer task, validation and routes. 
 Questions: should we add functionality to update products or manually add/delete etc.
+
+**DAY 2**
+
+Alve:
+
+
+Saranya: 
+DB finished looking for adding details, doing code review.
+
+Jakob: 
+Working on REST api for products. GET products and GET products by ID. Looking through documentation to confirm direction of work.
+
+Yetnayet: 
