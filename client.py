@@ -1,5 +1,7 @@
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 
+
+
 menu = {
     1:("Quit", "my_quit"),
     2:("Import products and categories", "import_products_and_categories_from_FakeStoreApi")

@@ -25,13 +25,13 @@ Questions: should we add functionality to update products or manually add/delete
 
 **DAY 2**
 
-Alve:
-
+Alve: Reworking on export to DB. blockage cause of confusion surrounding git/hub workflow. removed import code as this already finished by Jakob.
 
 Saranya: 
-DB finished looking for adding details, doing code review.
+DB finished looking for adding details, doing code review. REST api endpoints for add/update/del.
 
 Jakob: 
 Working on REST api for products. GET products and GET products by ID. Looking through documentation to confirm direction of work.
 
-Yetnayet: 
+Yetnayet: Worked on the Manage Customers feature. Added validation for customer details, such as requiring a name and a valid email address. Wrote database functions to save, retrieve, update, and delete customer records, and connected them to four API endpoints.
+Today I will test these operations locally and check that the customer fields match our shared database schema today.
