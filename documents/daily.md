@@ -35,3 +35,14 @@ Working on REST api for products. GET products and GET products by ID. Looking t
 
 Yetnayet: Worked on the Manage Customers feature. Added validation for customer details, such as requiring a name and a valid email address. Wrote database functions to save, retrieve, update, and delete customer records, and connected them to four API endpoints.
 Today I will test these operations locally and check that the customer fields match our shared database schema today.
+
+**DAY 3**
+Yetnayet: Testing customer API, discussed code review. Will follow up on code reviews.
+
+Jakob: Have been testing Yetnayet's code. Suggests to end sprint today and plan next one.
+
+Saranya: Worked on product CRUD. REST API and endpoints. Did reviews and responded to reviews.
+
+Alve: Spent yesterday with code review, worked a bit on export to DB code, and learned to better navigate the git/hub complex. 
+
+Today we chose to rework the DB schema: EXPLAIN LOGICS BEHIND. Alve reworks his code to fit this. We plan to merge and finish the sprint later today.

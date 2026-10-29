@@ -11,34 +11,35 @@ def imported_products_to_db(products, categories):
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    #getting names from products already in DB, this will be the basis for checking for duplicates.
-    cursor.execute("SELECT name FROM products")
-    existing_names = {row["name"] for row in cursor.fetchall()}
+    category_dicts = [{"name": cat} for cat in categories]
+    pprint.pprint(category_dicts)
 
-    #connecting category name with catergory id in dictionary
-    category_map = {}
-    for cat_name in categories:
-        cursor.execute("SELECT category_id FROM categories WHERE name = ?", (cat_name,))
-        row = cursor.fetchone()
-        if row:
-            category_map[cat_name] = row["category_id"]
-        else:
-            cursor.execute("INSERT INTO categories (name) VALUES (?)", (cat_name,))
-            category_map[cat_name] = cursor.lastrowid
+    cursor.executemany("""
+        INSERT OR IGNORE INTO categories (name)
+        VALUES (:name)
+        """, category_dicts)
+    
+    cursor.execute("""
+        SELECT category_id, name
+        FROM categories
+        """)
 
-    for data in products:
-        name = data.get('title')
-        price = data.get('price')
-        cat_name = data.get('category')
-        category_id = category_map.get(cat_name)
-        
-        if name in existing_names:
-            print(f"{name} already imported to DB")
-            continue
+    category_map ={row["name"]: row["category_id"] for row in cursor.fetchall()}
 
-        cursor.execute("INSERT INTO products (name, price, stock, category_id) VALUES (?, ?, ?, ?)", (name, price, 10, category_id))
-        
-        existing_names.add(name)
+    product_dicts = []
+    for product in products:
+        product_dicts.append({"name" : product.get('title'),
+                              "price": product.get('price'),
+                              "stock": 10,
+                              "category_id": category_map.get(product.get('category'))
+                              })
+
+    pprint.pprint(product_dicts)
+
+    cursor.executemany("""
+    INSERT OR IGNORE INTO products (name, price, stock, category_id) 
+    VALUES (:name, :price, :stock, :category_id)
+    """, product_dicts)
 
     conn.commit()
     conn.close()

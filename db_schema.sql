@@ -9,13 +9,11 @@ CREATE TABLE categories(
 CREATE TABLE products (
             product_id INTEGER PRIMARY KEY,
             category_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
+            name TEXT NOT NULL UNIQUE,
             price REAL NOT NULL CHECK (price >= 0.0),
             stock INTEGER NOT NULL CHECK (stock >= 0),
             FOREIGN KEY(category_id) REFERENCES categories(category_id)
 );
-
-
 
 CREATE TABLE customers(
             customer_id INTEGER PRIMARY KEY,
