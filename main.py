@@ -27,12 +27,14 @@ def get_products_from_database():
     products = [{"product_id": 2, "name": "T-shirt, white", "price": 99.99, "stock": 25, "category_id":1},
         {"product_id": 3, "name": "Sneakers, size: 49", "price": 1300, "stock": 1, "category_id": 3},
         {"product_id": 1, "name": "USB stick 16 GB", "price": 119, "stock": 0, "category_id":2}]
+    for product in products:
+        product_category = next(cat for cat in categories if product["category_id"] == cat["category_id"])
+        product["category_name"] = product_category["name"]
     return products
 
 categories = get_categories_from_database()
 products = get_products_from_database()
-print(products)
-print(categories)
+
 
 def products_compared_by_category(x: dict, y: dict):
     x_category = next((category for category in categories if x["category_id"] == category["category_id"]), None)
@@ -55,6 +57,7 @@ def get_products(name: str | None = Query(default=None, min_length=2),
     limit: int = Query(default=10, ge=1, le=100),
     offset: int = Query(default=0, ge=0)):
     rproducts = products
+
     if name:
         rproducts = [product for product in rproducts if name.lower() in product["name"].lower()]
     if category:
