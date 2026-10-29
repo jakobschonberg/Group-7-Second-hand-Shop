@@ -1,5 +1,14 @@
+# Builds the REST API and its interactive /docs page.
 fastapi>=0.115,<1
+
+# Validates request data. The [email] extra supports EmailStr validation.
 pydantic[email]>=2,<3
+
+# Loads local settings, such as API_KEY, from a .env file.
 python-dotenv>=1,<2
+
+# Sends HTTP requests to external APIs and from the client to our own API.
 requests>=2,<3
+
+# Runs the FastAPI server, for example: python -m uvicorn main:app --reload
 uvicorn>=0.30,<1
