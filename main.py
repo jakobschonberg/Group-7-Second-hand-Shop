@@ -9,6 +9,7 @@ from pathlib import Path as pathlibPath
 from os import getenv, path as osPath
 from fastapi import Header, Depends
 from json import load, dump
+import pprint
 from models import Product, Category
 from functools import cmp_to_key
 from fastapi import Path, Response
