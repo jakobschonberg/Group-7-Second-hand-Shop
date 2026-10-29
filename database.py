@@ -12,7 +12,6 @@ def imported_products_to_db(products, categories):
     cursor = conn.cursor()
 
     category_dicts = [{"name": cat} for cat in categories]
-    pprint.pprint(category_dicts)
 
     cursor.executemany("""
         INSERT OR IGNORE INTO categories (name)
@@ -33,8 +32,6 @@ def imported_products_to_db(products, categories):
                               "stock": 10,
                               "category_id": category_map.get(product.get('category'))
                               })
-
-    pprint.pprint(product_dicts)
 
     cursor.executemany("""
     INSERT OR IGNORE INTO products (name, price, stock, category_id) 
