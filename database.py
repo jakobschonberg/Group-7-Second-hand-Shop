@@ -2,6 +2,10 @@
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 import pprint
 import sqlite3
+import os
+import sqlite3
+from contextlib import contextmanager
+from pathlib import Path
 
 products = get_products_from_FakeStoreApi()
 categories = get_categories_from_FakeStoreApi()
@@ -41,13 +45,6 @@ def imported_products_to_db(products, categories):
     conn.commit()
     conn.close()
     return
-
-imported_products_to_db(products, categories)
-import os
-import sqlite3
-from contextlib import contextmanager
-from pathlib import Path
-
 
 @contextmanager
 def connection():
