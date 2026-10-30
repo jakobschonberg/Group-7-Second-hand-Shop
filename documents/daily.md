@@ -46,3 +46,15 @@ Saranya: Worked on product CRUD. REST API and endpoints. Did reviews and respond
 Alve: Spent yesterday with code review, worked a bit on export to DB code, and learned to better navigate the git/hub complex. 
 
 Today we chose to rework the DB schema: EXPLAIN LOGICS BEHIND. Alve reworks his code to fit this. We plan to merge and finish the sprint later today.
+
+**DAY 4**
+Saranya: testing locally, issues with alves code in PR running in client
+together with alve and jakob to use same connection to database DATABASE_PATH
+
+Alve: updated the code for export to db, code reveiw, updated some textual stuff, 
+
+Jakob: added category name to products in the rest api, merged, did reviews.
+
+Yetnayet: seed.py and client database rest options. 
+
+Today: discussing stuctural changes: is the fundamentals correct so we can move on and fix the minor functions? We are going to do another meeting after lunch.
