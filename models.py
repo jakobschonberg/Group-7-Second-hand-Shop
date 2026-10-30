@@ -1,10 +1,15 @@
+from pydantic import BaseModel, Field, StringConstraints
+from pydantic import ConfigDict, EmailStr
+from typing import Annotated
 from pydantic import BaseModel, Field
 from pydantic.types import StringConstraints
 from typing import Annotated, Literal
 from decimal import Decimal
 
+
 class Category(BaseModel):
-    name: Annotated[str, StringConstraints(strip_whitespace=True), Field(min_length=1, max_length=100)]    
+    name: Annotated[str, StringConstraints(
+        strip_whitespace=True), Field(min_length=1, max_length=100)]
     category_id: int = Field(ge=0)
 
     model_config = {
@@ -18,9 +23,11 @@ class Category(BaseModel):
         }
     }
 
+
 class Product(BaseModel):
     product_id: int = Field(ge=0)
-    name: Annotated[str, StringConstraints(strip_whitespace=True), Field(min_length=1, max_length=100)]    
+    name: Annotated[str, StringConstraints(
+        strip_whitespace=True), Field(min_length=1, max_length=100)]
     price: Decimal = Field(decimal_places=2)
     stock: int = Field(ge=0)
     category_id: int = Field(ge=0)
@@ -38,7 +45,6 @@ class Product(BaseModel):
             ]
         }
     }
-from pydantic import ConfigDict, EmailStr
 
 
 class CustomerInput(BaseModel):
@@ -51,3 +57,19 @@ class CustomerInput(BaseModel):
 
 class Customer(CustomerInput):
     customer_id: int
+
+
+class CreateProduct(BaseModel):
+    name: Annotated[str, StringConstraints(
+        strip_whitespace=True, min_length=1, max_length=100)]
+    category_id: int = Field(ge=1)
+    price: float = Field(ge=0, allow_inf_nan=False)
+    stock: int = Field(ge=0)
+
+
+class UpdateProduct(BaseModel):
+    name: Annotated[str, StringConstraints(
+        strip_whitespace=True, min_length=1, max_length=100)] | None = None
+    category_id: int | None = Field(default=None, ge=1)
+    price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    stock: int | None = Field(default=None, ge=0)
