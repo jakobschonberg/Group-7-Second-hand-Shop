@@ -23,6 +23,20 @@ def connection():
         conn.close()
 
 
+def get_all_categories_from_db() -> list[dict]:
+    with connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM categories")
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+
+def get_all_products_from_db() -> list[dict]:
+    with connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM products")
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+
 def imported_products_to_db(products, categories):
     with connection() as conn:
         cursor = conn.cursor()
