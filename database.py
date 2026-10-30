@@ -58,9 +58,6 @@ def imported_products_to_db(products, categories):
         return
 
 
-imported_products_to_db(products, categories)
-
-
 def list_customers():
     with connection() as conn:
         rows = conn.execute(
