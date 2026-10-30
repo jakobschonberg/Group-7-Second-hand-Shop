@@ -21,8 +21,11 @@ def lowercase(obj):
 def products_with_category_names(categories) -> list[dict]:
     products = database.get_all_products_from_db()
     for product in products:
-        product_category = next(cat for cat in categories if product["category_id"] == cat["category_id"])
-        product["category_name"] = product_category["name"]
+        product_category = next((cat for cat in categories if product["category_id"] == cat["category_id"]), None)
+        if product_category:
+            product["category_name"] = product_category["name"]
+        else:
+            product["category_name"] = "(unknown)"
     return products
 
 @app.get("/products")
