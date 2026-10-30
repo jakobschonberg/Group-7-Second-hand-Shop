@@ -16,74 +16,95 @@ from fastapi import Path, Response
 
 import database
 from models import Customer, CustomerInput
+from fastapi import FastAPI, HTTPException, Header, Depends
+from dotenv import load_dotenv
+import database
+from models import CreateProduct, UpdateProduct
 
 load_dotenv()
 app = FastAPI()
+
 
 def lowercase(obj):
     if type(obj) is str:
         return obj.lower()
     return obj
 
+
 def get_categories_from_database():
-    #TODO: remove this placeholder function
+    # TODO: remove this placeholder function
     categories = [{"name": "Clothings", "category_id": 1},
-        {"name": "Electronics", "category_id": 2},
-        {"name": "Shoes", "category_id": 3}]
+                  {"name": "Electronics", "category_id": 2},
+                  {"name": "Shoes", "category_id": 3}]
     return categories
 
+
 def get_products_from_database():
-    #TODO: remove this placeholder function
-    products = [{"product_id": 2, "name": "T-shirt, white", "price": 99.99, "stock": 25, "category_id":1},
-        {"product_id": 3, "name": "Sneakers, size: 49", "price": 1300, "stock": 1, "category_id": 3},
-        {"product_id": 1, "name": "USB stick 16 GB", "price": 119, "stock": 0, "category_id":2}]
+    # TODO: remove this placeholder function
+    products = [{"product_id": 2, "name": "T-shirt, white", "price": 99.99, "stock": 25, "category_id": 1},
+                {"product_id": 3, "name": "Sneakers, size: 49",
+                    "price": 1300, "stock": 1, "category_id": 3},
+                {"product_id": 1, "name": "USB stick 16 GB", "price": 119, "stock": 0, "category_id": 2}]
     for product in products:
-        product_category = next(cat for cat in categories if product["category_id"] == cat["category_id"])
+        product_category = next(
+            cat for cat in categories if product["category_id"] == cat["category_id"])
         product["category_name"] = product_category["name"]
     return products
+
 
 categories = get_categories_from_database()
 products = get_products_from_database()
 
 
 def products_compared_by_category(x: dict, y: dict):
-    x_category = next((category for category in categories if x["category_id"] == category["category_id"]), None)
-    y_category = next((category for category in categories if y["category_id"] == category["category_id"]), None)
-    print(x_category["name"], y_category["name"], x_category["name"] < y_category["name"])
+    x_category = next(
+        (category for category in categories if x["category_id"] == category["category_id"]), None)
+    y_category = next(
+        (category for category in categories if y["category_id"] == category["category_id"]), None)
+    print(x_category["name"], y_category["name"],
+          x_category["name"] < y_category["name"])
     if x_category["name"] < y_category["name"]:
         return -1
     if x_category["name"] > y_category["name"]:
         return 1
     return 0
 
+
 @app.get("/products")
 def get_products(name: str | None = Query(default=None, min_length=2),
-    category: str | None = Query(default=None, min_length=2),
-    minimum_price: float | None = Query(default = None),
-    maximum_price: float | None = Query(default = None),
-    in_stock: bool | None = Query(default = False),
-    sort_by: Literal["name", "price", "category"] = "name",
-    order: Literal["asc", "desc"] = "asc",
-    limit: int = Query(default=10, ge=1, le=100),
-    offset: int = Query(default=0, ge=0)):
+                 category: str | None = Query(default=None, min_length=2),
+                 minimum_price: float | None = Query(default=None),
+                 maximum_price: float | None = Query(default=None),
+                 in_stock: bool | None = Query(default=False),
+                 sort_by: Literal["name", "price", "category"] = "name",
+                 order: Literal["asc", "desc"] = "asc",
+                 limit: int = Query(default=10, ge=1, le=100),
+                 offset: int = Query(default=0, ge=0)):
     rproducts = products
 
     if name:
-        rproducts = [product for product in rproducts if name.lower() in product["name"].lower()]
+        rproducts = [product for product in rproducts if name.lower()
+                     in product["name"].lower()]
     if category:
-        matching_categories = [cat for cat in categories if category.lower() in cat["name"].lower()]
-        rproducts = [product for product in rproducts if product["category_id"] in map(lambda d: d["category_id"], matching_categories)]
+        matching_categories = [
+            cat for cat in categories if category.lower() in cat["name"].lower()]
+        rproducts = [product for product in rproducts if product["category_id"] in map(
+            lambda d: d["category_id"], matching_categories)]
     if minimum_price:
-        rproducts = [product for product in rproducts if product["price"] >= minimum_price]
+        rproducts = [
+            product for product in rproducts if product["price"] >= minimum_price]
     if maximum_price:
-        rproducts = [product for product in rproducts if product["price"] <= maximum_price]
+        rproducts = [
+            product for product in rproducts if product["price"] <= maximum_price]
     if in_stock:
         rproducts = [product for product in rproducts if product["stock"] >= 1]
     sorted_products = []
     if sort_by == "category":
-        sorted_products = sorted(rproducts, key=cmp_to_key(products_compared_by_category), reverse=(order == "desc"))
+        sorted_products = sorted(rproducts, key=cmp_to_key(
+            products_compared_by_category), reverse=(order == "desc"))
     else:
-        sorted_products = sorted(rproducts, key=lambda m: lowercase(m[sort_by]), reverse=(order == "desc"))
+        sorted_products = sorted(rproducts, key=lambda m: lowercase(
+            m[sort_by]), reverse=(order == "desc"))
     total = len(sorted_products)
     page = sorted_products[offset:offset + limit]
     return {"total": total, "limit": limit, "offset": offset, "products": page}
@@ -91,7 +112,8 @@ def get_products(name: str | None = Query(default=None, min_length=2),
 
 @app.get("/products/{product_id}")
 def get_product(product_id: int = FastApiPath(ge=0)):
-    found_product = next((product for product in products if product["product_id"] == product_id), None)
+    found_product = next(
+        (product for product in products if product["product_id"] == product_id), None)
     if found_product:
         return found_product
     raise HTTPException(status_code=404, detail="product not found")
@@ -143,3 +165,57 @@ def remove_customer(customer_id: int = Path(gt=0)):
     if not deleted:
         raise HTTPException(404, "Customer not found")
     return Response(status_code=204)
+
+
+@app.post("/products", dependencies=[Depends(require_api_key)], status_code=201)
+def create_products(product: CreateProduct):
+    new_product = {
+        "name": product.name,
+        "category_id": product.category_id,
+        "price": product.price,
+        "stock": product.stock
+    }
+    try:
+        new_product_id = database.create_product(new_product)
+        return {"product_id": new_product_id, **new_product}
+    except sqlite3.IntegrityError as error:
+        print(error)
+        if "FOREIGN KEY" in str(error):
+            raise HTTPException(
+                status_code=422, detail="Category does not exist") from error
+        if "UNIQUE" in str(error):
+            raise HTTPException(
+                status_code=409, detail="Product Already exists") from error
+        raise HTTPException(
+            status_code=422) from error
+
+
+@app.patch("/products/{product_id}", dependencies=[Depends(require_api_key)])
+def update_product(changes: UpdateProduct, product_id: int):
+    try:
+        existing_product = database.search_product(product_id)
+        if existing_product is None:
+            raise HTTPException(status_code=404, detail="Product Not Found")
+
+        existing_product.update(changes.model_dump(exclude_unset=True))
+        if not database.update_product(product_id, existing_product):
+            raise HTTPException(status_code=404, detail="Product Not Found")
+        return existing_product
+
+    except sqlite3.IntegrityError as error:
+        if "FOREIGN KEY" in str(error):
+            raise HTTPException(
+                status_code=422, detail="Category does not exist") from error
+        raise HTTPException(
+            status_code=422) from error
+
+
+@app.delete("/products/{product_id}", dependencies=[Depends(require_api_key)], status_code=204)
+def delete_product(product_id: int):
+    try:
+        if not database.delete_product(product_id):
+            raise HTTPException(status_code=404, detail="Product not found")
+
+    except sqlite3.IntegrityError as error:
+        raise HTTPException(
+            status_code=409, detail="Cannot delete product because related records exist") from error
