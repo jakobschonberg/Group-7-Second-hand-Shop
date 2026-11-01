@@ -45,3 +45,35 @@ By design most stored data should not be retrievable by unauthorized actors, con
 
 ## Project & Team Process
 This is a group project for the educational programme called "Python AI & ML system developer" provided by Lexicon. The project is an exercise in combining what has been included in the education so far. In the project we utilize tools such as python programming, SQL, API's. An important requirement to this project was to run it according to the praxis of Scrum and the doxa of Agile development philosophy. This forces the group to work 'slow and steady' and take strategic choices from start, every single day and within every sprint while at the same time reevaluate often. <br> While the team, a gang of four, mainly took decisions out of respect to the socratic method and consensus, some roles were required for the project to be in line with the praxis of scrum. For the first sprint, the product owner was Saranya and the scrum master was Alve. As of the second sprint, we switched up our roles and had Jakob as product owner and Yetnayet as scrum master.
+
+## Create or reset test data
+
+We use `seed.py` to fill the database with test data so we can try out our features.
+It uses the tables from `db_schema.sql`.
+
+To run it:
+
+1. Install the packages from `requirements.txt` in your virtual environment.
+2. Set `DATABASE_PATH=shop.db` in the project's `.env` file.
+3. Open a terminal in the project folder and run `python client.py`.
+4. Choose **3** to reset the database with test data.
+
+This removes the existing data in the five shop tables, so only use it on a test database.
+Run the API from the same folder with the same database setting so it can see this data.
+Do not push your `.env` or database files to GitHub.
+
+The test data includes:
+
+- 3 categories
+- 5 products
+- 4 customers
+- 4 orders
+- 5 order items
+
+We included examples like a product with no stock, a product with a price of zero,
+and a customer with no phone number or city. There are also orders with different
+statuses and an order with more than one product.
+
+You can choose **3** again to start over with the same test data. It works without
+internet access. If something fails during the reset, the changes are undone
+and the previous data is kept.
