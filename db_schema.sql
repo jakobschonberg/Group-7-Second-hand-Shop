@@ -3,7 +3,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE categories(
              category_id INTEGER PRIMARY KEY,
-             name TEXT UNIQUE
+             name TEXT NOT NULL COLLATE NOCASE UNIQUE
 );
 
 CREATE TABLE products (

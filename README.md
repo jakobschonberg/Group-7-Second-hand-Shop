@@ -72,8 +72,14 @@ The test data includes:
 
 We included examples like a product with no stock, a product with a price of zero,
 and a customer with no phone number or city. There are also orders with different
-statuses and an order with more than one product.
+statuses and an order with more than one product. Alex has only an old order,
+dated `2018-01-01`, so we can test a customer whose orders are older than seven years.
 
 You can choose **3** again to start over with the same test data. It works without
 internet access. If something fails during the reset, the changes are undone
 and the previous data is kept.
+
+Category names are required. Names such as `Electronics` and `electronics`
+count as the same category. This schema change applies to newly created or
+reset databases; existing databases are not changed automatically. Reset only
+a test database, because resetting removes its existing shop data.
