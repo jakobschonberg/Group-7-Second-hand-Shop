@@ -7,6 +7,8 @@ from fastapi import Header, Depends
 import database
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct
 from dotenv import load_dotenv
+from receipt import Receipt_row, Receipt
+from datetime import datetime
 
 
 load_dotenv()
@@ -177,3 +179,15 @@ def delete_product(product_id: int):
     except IntegrityError as error:
         raise HTTPException(
             status_code=409, detail="Cannot delete product because related records exist") from error
+
+@app.get("/orders/{order_id}/receipt")
+def get_receipt(order_id: int = FastApiPath(ge=0)):
+    receipt_rows = database.get_receipt_from_db(order_id)
+    if len(receipt_rows) == 0:
+        raise HTTPException(status_code=404, detail="order not found")
+    row0 = receipt_rows[0]
+    receipt = Receipt(row0["order_date"], row0["order_id"], [])
+    for row in receipt_rows:
+        receipt.add_row(Receipt_row(row["name"], row["quantity"], row["row_price"]))
+    return receipt
+    
