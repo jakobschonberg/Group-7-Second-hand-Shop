@@ -1,5 +1,6 @@
 import sqlite3
 from seed import reset_database
+from database import imported_products_to_db
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 
 
@@ -14,8 +15,6 @@ def my_quit():
     pass
 
 def import_products_and_categories_from_FakeStoreApi():
-    from database import imported_products_to_db
-
     products = get_products_from_FakeStoreApi()
     categories = get_categories_from_FakeStoreApi()
     imported_products_to_db(products, categories)
