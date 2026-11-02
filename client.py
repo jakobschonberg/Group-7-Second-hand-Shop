@@ -1,25 +1,27 @@
 import sqlite3
 from seed import reset_database
-from database import imported_products_to_db
+from database import imported_products_to_db, list_products_not_part_of_orders
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 
 
-
 menu = {
-    1:("Quit", "my_quit"),
-    2:("Import products and categories", "import_products_and_categories_from_FakeStoreApi"),
-    3:("Reset database (replaces data with test data)", "reset_test_data")
+    1: ("Quit", "my_quit"),
+    2: ("Import products and categories", "import_products_and_categories_from_FakeStoreApi"),
+    3: ("Reset database (replaces data with test data)", "reset_test_data"),
+    4: ("List products that never been sold", "list_products_never_sold")
 }
+
 
 def my_quit():
     pass
+
 
 def import_products_and_categories_from_FakeStoreApi():
     products = get_products_from_FakeStoreApi()
     categories = get_categories_from_FakeStoreApi()
     imported_products_to_db(products, categories)
-    #TODO: check if we already have these products / categories in the database
-    #TODO: each product / category not already in database should be saved in database
+    # TODO: check if we already have these products / categories in the database
+    # TODO: each product / category not already in database should be saved in database
 
 
 def reset_test_data():
@@ -29,6 +31,25 @@ def reset_test_data():
         print(f"Could not reset database: {error}")
     else:
         print(f"Database reset with test data: {path}")
+
+
+def list_products_never_sold():
+    try:
+        products = list_products_not_part_of_orders()
+
+    except sqlite3.Error as error:
+        print(f"Database Error: {error}")
+        return
+
+    if not products:
+        print("No products found")
+        return
+
+    print(
+        f"{"product_id":^15} {"name":<100} {"category":<10}")
+    for product in products:
+        print(
+            f"{product["product_id"]:^15} {product["name"]:<100} {product["category"]:<10}")
 
 
 def main():
@@ -47,5 +68,6 @@ def main():
         if choice:
             chosen = menu[choice][1]
             globals()[chosen]()
+
 
 main()
