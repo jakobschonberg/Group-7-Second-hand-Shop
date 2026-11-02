@@ -56,7 +56,8 @@ To run it:
 1. Install the packages from `requirements.txt` in your virtual environment.
 2. Set `DATABASE_PATH=shop.db` in the project's `.env` file.
 3. Open a terminal in the project folder and run `python client.py`.
-4. Choose **3** to reset the database with test data.
+4. Choose **3**, then type **yes** to reset the database with test data.
+   Any other answer cancels the reset and returns to the menu.
 
 This removes the existing data in the five shop tables, so only use it on a test database.
 Run the API from the same folder with the same database setting so it can see this data.

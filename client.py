@@ -23,6 +23,13 @@ def import_products_and_categories_from_FakeStoreApi():
 
 
 def reset_test_data():
+    confirmation = input(
+        'This deletes all data in the five shop tables. Type "yes" to continue: '
+    )
+    if confirmation.strip().lower() != 'yes':
+        print("Reset cancelled.")
+        return
+
     try:
         path = reset_database()
     except (sqlite3.Error, OSError) as error:
