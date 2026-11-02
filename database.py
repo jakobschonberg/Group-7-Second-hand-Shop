@@ -4,6 +4,7 @@ from pathlib import Path
 from contextlib import contextmanager
 import os
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
+from datetime import datetime, timedelta
 
 products = get_products_from_FakeStoreApi()
 categories = get_categories_from_FakeStoreApi()
@@ -104,19 +105,51 @@ def update_customer(customer_id, data):
         return {"customer_id": customer_id, **data}
 
 
-def delete_customer(customer_id):
+def delete_customer(customer_id): #### So... DELETE FROM order_items in this function could also be solved with somthing like ON DELETE CASCADE in db schema. I think. Not sure what is or if there is a "correct" way to solve this.
     with connection() as conn:
         conn.execute("BEGIN IMMEDIATE")
-        if conn.execute(
-            "SELECT 1 FROM orders WHERE customer_id = ? LIMIT 1",
-            (customer_id,),
-        ).fetchone():
-            raise ValueError("Customer has orders")
-        cursor = conn.execute(
-            "DELETE FROM customers WHERE customer_id = ?", (customer_id,)
-        )
-        return cursor.rowcount > 0
+        
+        cutoff_date = (datetime.now() - timedelta(days=7*365)).strftime("%Y-%m-%d")
 
+        has_recent_orders = conn.execute(
+            "SELECT 1 FROM orders WHERE customer_id = ? AND order_date >= ? LIMIT 1",
+            (customer_id, cutoff_date)
+        ).fetchone()
+        
+        if has_recent_orders:
+            conn.execute(
+                "UPDATE customers SET name = ?, email = ?, phone_no = ?, city = ? WHERE customer_id = ?",
+                ("Anonymiserad Kund", f"deleted_{customer_id}@anonymized.com", None, None, customer_id)
+            )
+            conn.execute(
+                """
+                DELETE FROM order_items 
+                WHERE order_id IN (
+                    SELECT order_id FROM orders WHERE customer_id = ? AND order_date < ?
+                )
+                """,
+                (customer_id, cutoff_date)
+            )
+            conn.execute(
+                "DELETE FROM orders WHERE customer_id = ? AND order_date < ?",
+                (customer_id, cutoff_date)
+            )
+            return True
+            
+        else:
+            conn.execute(
+                """
+                DELETE FROM order_items 
+                WHERE order_id IN (
+                    SELECT order_id FROM orders WHERE customer_id = ?
+                )
+                """,
+                (customer_id,)
+            )
+            conn.execute("DELETE FROM orders WHERE customer_id = ?", (customer_id,))
+            
+            cursor = conn.execute("DELETE FROM customers WHERE customer_id = ?", (customer_id,))
+            return cursor.rowcount > 0
 
 def create_product(product: dict):
     with connection() as conn:
