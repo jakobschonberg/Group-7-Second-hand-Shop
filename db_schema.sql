@@ -3,7 +3,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE categories(
              category_id INTEGER PRIMARY KEY,
-             name TEXT UNIQUE
+             name TEXT NOT NULL COLLATE NOCASE UNIQUE
 );
 
 CREATE TABLE products (
@@ -24,7 +24,7 @@ CREATE TABLE customers(
 );
 
 CREATE TABLE orders(
-    order_id INTEGER PRIMARY_KEY,
+    order_id INTEGER PRIMARY KEY,
     customer_id INTEGER NOT NULL,
     status TEXT NOT NULL DEFAULT 'NEW' CHECK (status IN ('NEW','DELIVERED','CANCELLED')),
     order_date TEXT NOT NULL,

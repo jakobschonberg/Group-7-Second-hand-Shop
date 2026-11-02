@@ -53,7 +53,7 @@ def imported_products_to_db(products, categories):
             FROM categories
             """)
 
-        category_map = {row["name"]: row["category_id"]
+        category_map = {row["name"].lower(): row["category_id"]
                         for row in cursor.fetchall()}
 
         product_dicts = []
@@ -61,7 +61,7 @@ def imported_products_to_db(products, categories):
             product_dicts.append({"name": product.get('title'),
                                   "price": product.get('price'),
                                   "stock": 10,
-                                  "category_id": category_map.get(product.get('category'))
+                                  "category_id": category_map.get((product.get('category') or '').lower())
                                   })
 
         cursor.executemany("""
