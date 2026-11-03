@@ -232,3 +232,16 @@ def list_products_not_part_of_orders():
         ).fetchall()
 
         return [dict(product) for product in rows]
+
+def get_customer_full_data(customer_id: int):
+    with connection() as conn:
+
+        customer_row = conn.execute("SELECT * FROM customers WHERE customer_id = ?", (customer_id,)).fetchone()
+
+        if not customer_row:
+            return None
+
+        customer_data = dict(customer_row)
+        customer_data["orders"] = []
+
+        return customer_data

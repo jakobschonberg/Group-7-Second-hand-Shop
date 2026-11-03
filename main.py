@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Response, Header, Depends, Query, Pa
 from typing import Literal
 from fastapi import Header, Depends
 import database
-from models import Customer, CustomerInput, CreateProduct, UpdateProduct
+from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CustomerDataExport
 from dotenv import load_dotenv
 from receipt import Receipt_row, Receipt
 from datetime import datetime
@@ -191,3 +191,14 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
         receipt.add_row(Receipt_row(row["name"], row["quantity"], row["unit_price"], row["row_price"]))
     return receipt
     
+@app.get("/customers/{customer_id}/data", response_model=CustomerDataExport, dependencies=[Depends(require_api_key)])
+def get_customer_data_export(customer_id: int):
+    customer_data = database.get_customer_full_data(customer_id)
+    
+    if not customer_data:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Customer with ID {customer_id} not found."
+        )
+        
+    return customer_data
