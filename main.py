@@ -6,6 +6,7 @@ from typing import Literal
 from fastapi import Header, Depends
 import database
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct
+from models import OrderInput, OrderStatusUpdate
 from dotenv import load_dotenv
 from receipt import Receipt_row, Receipt
 from datetime import datetime
@@ -191,3 +192,38 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
         receipt.add_row(Receipt_row(row["name"], row["quantity"], row["unit_price"], row["row_price"]))
     return receipt
     
+
+
+
+@app.get("/orders")
+def get_orders(customer_id: int | None = Query(default=None, gt=0)):
+    return database.list_orders(customer_id)
+
+
+@app.get("/orders/{order_id}")
+def get_order(order_id: int = FastApiPath(gt=0)):
+    order = database.get_order(order_id)
+    if order is None:
+        raise HTTPException(404, "Order not found")
+    return order
+
+
+@app.post("/orders", status_code=201,
+          dependencies=[Depends(require_api_key)])
+def post_order(order: OrderInput):
+    try:
+        return database.create_order(order.model_dump())
+    except LookupError as error:
+        raise HTTPException(404, str(error)) from error
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+
+
+@app.patch("/orders/{order_id}", dependencies=[Depends(require_api_key)])
+def patch_order(changes: OrderStatusUpdate, order_id: int = FastApiPath(gt=0)):
+    try:
+        return database.update_order_status(order_id, changes.status)
+    except LookupError as error:
+        raise HTTPException(404, str(error)) from error
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error

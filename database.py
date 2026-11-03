@@ -232,3 +232,105 @@ def list_products_not_part_of_orders():
         ).fetchall()
 
         return [dict(product) for product in rows]
+
+
+def read_order(conn, order_id):
+    row = conn.execute(
+        "SELECT order_id, customer_id, status, order_date FROM orders "
+        "WHERE order_id = ?", (order_id,)
+    ).fetchone()
+    if row is None:
+        return None
+    order = dict(row)
+    items = conn.execute(
+        "SELECT product_id, quantity, unit_price FROM order_items "
+        "WHERE order_id = ? ORDER BY product_id", (order_id,)
+    ).fetchall()
+    order["items"] = [dict(item) for item in items]
+    return order
+
+
+def get_order(order_id):
+    with connection() as conn:
+        return read_order(conn, order_id)
+
+
+def list_orders(customer_id=None):
+    with connection() as conn:
+        if customer_id is None:
+            rows = conn.execute(
+                "SELECT order_id FROM orders ORDER BY order_id"
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT order_id FROM orders WHERE customer_id = ? "
+                "ORDER BY order_id", (customer_id,)
+            ).fetchall()
+        return [read_order(conn, row["order_id"]) for row in rows]
+
+
+def create_order(data):
+    with connection() as conn:
+        # Lock before checking stock so two orders cannot buy the same last item.
+        conn.execute("BEGIN IMMEDIATE")
+        customer = conn.execute(
+            "SELECT 1 FROM customers WHERE customer_id = ?",
+            (data["customer_id"],)
+        ).fetchone()
+        if customer is None:
+            raise LookupError("Customer not found")
+
+        cursor = conn.execute(
+            "INSERT INTO orders (customer_id, status, order_date) "
+            "VALUES (?, 'NEW', date('now'))", (data["customer_id"],)
+        )
+        order_id = cursor.lastrowid
+        quantities = {}
+        for item in data["items"]:
+            product_id = item["product_id"]
+            quantities[product_id] = (
+                quantities.get(product_id, 0) + item["quantity"]
+            )
+
+        for product_id, quantity in quantities.items():
+            product = conn.execute(
+                "SELECT price, stock FROM products WHERE product_id = ?",
+                (product_id,)
+            ).fetchone()
+            if product is None:
+                raise LookupError(f"Product {product_id} not found")
+            if product["stock"] < quantity:
+                raise ValueError(f"Not enough stock for product {product_id}")
+            conn.execute(
+                "INSERT INTO order_items "
+                "(order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)",
+                (order_id, product_id, quantity, product["price"])
+            )
+            conn.execute(
+                "UPDATE products SET stock = stock - ? WHERE product_id = ?",
+                (quantity, product_id)
+            )
+        return read_order(conn, order_id)
+
+
+def update_order_status(order_id, status):
+    with connection() as conn:
+        conn.execute("BEGIN IMMEDIATE")
+        order = read_order(conn, order_id)
+        if order is None:
+            raise LookupError("Order not found")
+        if status == order["status"]:
+            return order
+        if order["status"] != "NEW":
+            raise ValueError("Only NEW orders can change status")
+        if status == "CANCELLED":
+            for item in order["items"]:
+                conn.execute(
+                    "UPDATE products SET stock = stock + ? WHERE product_id = ?",
+                    (item["quantity"], item["product_id"])
+                )
+        conn.execute(
+            "UPDATE orders SET status = ? WHERE order_id = ?",
+            (status, order_id)
+        )
+        return read_order(conn, order_id)

@@ -73,3 +73,20 @@ class UpdateProduct(BaseModel):
     category_id: int | None = Field(default=None, ge=1)
     price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     stock: int | None = Field(default=None, ge=0)
+
+
+class OrderItemInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    product_id: int = Field(gt=0, strict=True)
+    quantity: int = Field(gt=0, strict=True)
+
+
+class OrderInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    customer_id: int = Field(gt=0, strict=True)
+    items: list[OrderItemInput] = Field(min_length=1)
+
+
+class OrderStatusUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: Literal["NEW", "DELIVERED", "CANCELLED"]
