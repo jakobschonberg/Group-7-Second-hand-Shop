@@ -1,14 +1,12 @@
 from os import getenv
+from typing import Literal
 from secrets import compare_digest
 from sqlite3 import IntegrityError, Error
-from fastapi import FastAPI, HTTPException, Response, Header, Depends, Query, Path as FastApiPath
-from typing import Literal
-from fastapi import Header, Depends
+from fastapi import FastAPI, HTTPException, Header, Depends, Query, Path as FastApiPath
+from dotenv import load_dotenv
 import database
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
-from dotenv import load_dotenv
 from receipt import Receipt_row, Receipt
-from datetime import datetime
 
 
 load_dotenv()
