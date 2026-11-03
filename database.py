@@ -108,6 +108,14 @@ def update_customer(customer_id, data):
 def delete_customer(customer_id): #### So... DELETE FROM order_items in this function could also be solved with somthing like ON DELETE CASCADE in db schema. I think. Not sure what is or if there is a "correct" way to solve this.
     with connection() as conn:
         conn.execute("BEGIN IMMEDIATE")
+
+        customer_exists = conn.execute(
+            "SELECT 1 FROM customers WHERE customer_id = ?", 
+            (customer_id,)
+        ).fetchone()
+        
+        if not customer_exists:
+            return False
         
         cutoff_date = (datetime.now() - timedelta(days=7*365)).strftime("%Y-%m-%d")
 
@@ -134,7 +142,7 @@ def delete_customer(customer_id): #### So... DELETE FROM order_items in this fun
                 "DELETE FROM orders WHERE customer_id = ? AND order_date < ?",
                 (customer_id, cutoff_date)
             )
-            return True
+            return "pseudonymized"
             
         else:
             conn.execute(
@@ -149,7 +157,7 @@ def delete_customer(customer_id): #### So... DELETE FROM order_items in this fun
             conn.execute("DELETE FROM orders WHERE customer_id = ?", (customer_id,))
             
             cursor = conn.execute("DELETE FROM customers WHERE customer_id = ?", (customer_id,))
-            return cursor.rowcount > 0
+            return "deleted"
 
 def create_product(product: dict):
     with connection() as conn:

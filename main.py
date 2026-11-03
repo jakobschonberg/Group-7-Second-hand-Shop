@@ -111,13 +111,18 @@ def put_customer(customer: CustomerInput, customer_id: int = FastApiPath(gt=0)):
     return result
 
 
-@app.delete("/customers/{customer_id}", status_code=204,
+@app.delete("/customers/{customer_id}", status_code=200,
             dependencies=[Depends(require_api_key)])
 def remove_customer(customer_id: int = FastApiPath(gt=0)):
-    deleted = database.delete_customer(customer_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail='Customer not found')
-    return
+    action = database.delete_customer(customer_id)
+
+    if action == False:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    if action == "pseudonymized":
+        return {"message": "Customer has orders within the last seven years and was thus pseudonymized instead of deleted."}
+    else:
+        return {"message": "Customer had no orders within the last seven years and was permanently deleted."}
 
 
 @app.post("/products", dependencies=[Depends(require_api_key)], status_code=201)
