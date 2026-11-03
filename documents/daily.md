@@ -58,3 +58,12 @@ Jakob: added category name to products in the rest api, merged, did reviews.
 Yetnayet: seed.py and client database rest options. 
 
 Today: discussing stuctural changes: is the fundamentals correct so we can move on and fix the minor functions? We are going to do another meeting after lunch.
+
+**Day 5** 
+Jakob: Work on order receipts and write user stories for splitting the menu program.
+
+Alve: Start code review #19 and continue working on his user story #11.
+
+Saranya: Review the PR and continue working on statistics, especially products that have never been sold.
+
+Yetnayet: Address review feedback on task #19, test the category changes,
