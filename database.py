@@ -242,6 +242,12 @@ def get_customer_full_data(customer_id: int):
             return None
 
         customer_data = dict(customer_row)
-        customer_data["orders"] = []
+
+        order_rows = conn.execute(
+            "SELECT order_id, status, order_date FROM orders WHERE customer_id = ?",
+            (customer_id,)
+        ).fetchall()
+
+        
 
         return customer_data
