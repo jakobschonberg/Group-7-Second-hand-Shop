@@ -1,4 +1,4 @@
-#builds database and adds test data
+# builds database and adds test data
 import os
 import sqlite3
 from pathlib import Path
@@ -10,6 +10,8 @@ CATEGORIES = [
     (1, 'Clothing'),
     (2, 'Electronics'),
     (3, 'Shoes'),
+    (4, 'Accessories'),
+
 ]
 PRODUCTS = [
     (1, 1, 'White T-shirt', 50.0, 10),
@@ -17,6 +19,7 @@ PRODUCTS = [
     (3, 2, 'USB keyboard', 80.0, 1),
     (4, 2, 'Wired headphones', 0.0, 5),
     (5, 3, 'Running shoes', 150.0, 3),
+    (6, 4, 'Scarf', 220.0, 3),
 ]
 CUSTOMERS = [
     (1, 'Ada', 'ada@example.com', None, None),
@@ -29,6 +32,11 @@ ORDERS = [
     (2, 2, 'DELIVERED', '2026-10-27'),
     (3, 2, 'CANCELLED', '2026-10-28'),
     (4, 3, 'DELIVERED', '2018-01-01'),
+    (5, 4, 'NEW', '2025-04-01'),
+    (6, 4, 'DELIVERED', '2024-09-01'),
+    (7, 3, 'DELIVERED', '2025-10-01'),
+    (8, 3, 'CANCELLED', '2025-10-01'),
+
 ]
 ORDER_ITEMS = [
     (1, 1, 50.0, 1),
@@ -36,6 +44,11 @@ ORDER_ITEMS = [
     (2, 2, 250.0, 1),
     (3, 3, 80.0, 1),
     (4, 4, 0.0, 1),
+    (5, 5, 150.0, 2),
+    (5, 6, 220.0, 3),
+    (6, 5, 150.0, 3),
+    (7, 6, 220.0, 1),
+    (8, 6, 220.0, 1),
 ]
 
 
