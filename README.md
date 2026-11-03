@@ -34,10 +34,15 @@ The city of the customer, used for regional tracking and logistics.<br>
 Excluded Data (Privacy by Design):<br>
 We do not store full street addresses, personal identity numbers, or payment/credit card details in the database to minimize security risks and protect user privacy.
 
-To comply with GDPR's 'right to be forgotten', we have written a function that will delete or pseudonymize customers that requests this. The pseudonymization is used when a customer requests deletion but has an order newer than 7 years, this is to comply with the bokföringslag/BFL (1999:1078).<br>
-To comply with GDPR's 'right of access', we have created an endpoint that will, if authorized, show all the information stored about a singular customer.
+How GDPR requests are handled:<br>
+Because these administrative endpoints (deletion and data export) are protected by an X-Api-Key, they are designed to be used by store administrators or support staff on behalf of the customer, rather than as unprotected self-service endpoints. This prevents unauthorized exposure of personal data.
 
-By design most stored data should not be retrievable by unauthorized actors, confirmed by an api key. And access to personal customer data is authorized for the very few.
+Edge Case Handling (Mixed Orders):<br>
+In scenarios where a customer requests deletion and has a mix of orders—some older than 7 years and some newer—the system applies a hybrid approach to balance GDPR and BFL:
+
+The expired orders (older than 7 years) are permanently deleted to respect data minimization.
+
+The customer profile and any active orders (newer than 7 years) are pseudonymized rather than deleted, keeping the accounting records intact while stripping away the physical identity.
 
 ## ER Diagram
 <img width="1036" height="637" alt="image" src="https://github.com/user-attachments/assets/c3ee89e6-a47a-4ba7-996f-02a17eef3aeb" />
@@ -56,7 +61,8 @@ To run it:
 1. Install the packages from `requirements.txt` in your virtual environment.
 2. Set `DATABASE_PATH=shop.db` in the project's `.env` file.
 3. Open a terminal in the project folder and run `python client.py`.
-4. Choose **3** to reset the database with test data.
+4. Choose **3**, then type **yes** to reset the database with test data.
+   Any other answer cancels the reset and returns to the menu.
 
 This removes the existing data in the five shop tables, so only use it on a test database.
 Run the API from the same folder with the same database setting so it can see this data.
@@ -72,8 +78,14 @@ The test data includes:
 
 We included examples like a product with no stock, a product with a price of zero,
 and a customer with no phone number or city. There are also orders with different
-statuses and an order with more than one product.
+statuses and an order with more than one product. Alex has only an old order,
+dated `2018-01-01`, so we can test a customer whose orders are older than seven years.
 
 You can choose **3** again to start over with the same test data. It works without
 internet access. If something fails during the reset, the changes are undone
 and the previous data is kept.
+
+Category names are required. Names such as `Electronics` and `electronics`
+count as the same category. This schema change applies to newly created or
+reset databases; existing databases are not changed automatically. Reset only
+a test database, because resetting removes its existing shop data.
