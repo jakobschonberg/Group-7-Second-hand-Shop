@@ -73,3 +73,8 @@ class UpdateProduct(BaseModel):
     category_id: int | None = Field(default=None, ge=1)
     price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     stock: int | None = Field(default=None, ge=0)
+
+
+class CategoryRevenue(BaseModel):
+    category: str
+    revenue: float
