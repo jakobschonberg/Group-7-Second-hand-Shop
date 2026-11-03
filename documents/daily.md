@@ -67,3 +67,14 @@ Alve: Start code review #19 and continue working on his user story #11.
 Saranya: Review the PR and continue working on statistics, especially products that have never been sold.
 
 Yetnayet: Address review feedback on task #19, test the category changes,
+
+**DAY 6** 
+Jakob: Created a pull request for order receipts, added receipt tests, and joined three database tables using SQL. And plan/offer to start work on new user story.
+
+Alve: Finished PR #30 and started working on a user story from the Ready section. Wants to take enough time to implement it correctly.
+
+Yetnayet: Working on the Place Order user story and plans to finish it today.
+
+Saranya: Plans to merge the pull request for products that have never been sold. Continuing with revenue calculations and expects to finish today.
+
+Today Discussion: Four user stories were still remaining. We discussed how to distribute them and agreed that each team member would take one story. The team aims to finish the remaining work by Wednesday afternoon.
