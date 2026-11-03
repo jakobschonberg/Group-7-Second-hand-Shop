@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from pydantic.types import StringConstraints
 from typing import Annotated, Literal
 from decimal import Decimal
-
+from typing import List, Optional
 
 class Category(BaseModel):
     name: Annotated[str, StringConstraints(
@@ -73,3 +73,22 @@ class UpdateProduct(BaseModel):
     category_id: int | None = Field(default=None, ge=1)
     price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     stock: int | None = Field(default=None, ge=0)
+
+class OrderItemExport(BaseModel):
+    name: str
+    quantity: int
+    unit_price: Decimal
+
+class OrderExport(BaseModel):
+    order_id: int
+    status: str
+    order_date: str
+    items: List[OrderItemExport]
+
+class CustomerDataExport(BaseModel):
+    customer_id: int
+    name: str
+    email: str
+    phone_no: Optional[str] = None
+    city: Optional[str] = None
+    orders: List[OrderExport]
