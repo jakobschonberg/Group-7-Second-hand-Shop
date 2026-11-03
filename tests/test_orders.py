@@ -53,11 +53,11 @@ class OrderTests(unittest.TestCase):
         with closing(sqlite3.connect(self.path)) as conn:
             conn.execute('UPDATE products SET price=99 WHERE product_id=1')
             conn.commit()
-        saved = self.client.get(f"/orders/{order['order_id']}").json()
+        saved = self.client.get(f"/orders/{order['order_id']}", headers=self.headers).json()
         self.assertEqual(saved['items'][0]['unit_price'], 50)
-        filtered = self.client.get('/orders?customer_id=1').json()
+        filtered = self.client.get('/orders?customer_id=1', headers=self.headers).json()
         self.assertTrue(all(row['customer_id'] == 1 for row in filtered))
-        self.assertEqual(len(self.client.get('/orders').json()), 5)
+        self.assertEqual(len(self.client.get('/orders', headers=self.headers).json()), 5)
 
     def test_multiple_products_and_repeated_product(self):
         response = self.post([
@@ -83,8 +83,8 @@ class OrderTests(unittest.TestCase):
 
     def test_missing_resources(self):
         self.assertEqual(self.post([{'product_id': 1, 'quantity': 1}], 999).status_code, 404)
-        self.assertEqual(self.client.get('/orders/999').status_code, 404)
-        self.assertEqual(self.client.get('/orders?customer_id=999').json(), [])
+        self.assertEqual(self.client.get('/orders/999', headers=self.headers).status_code, 404)
+        self.assertEqual(self.client.get('/orders?customer_id=999', headers=self.headers).json(), [])
         self.assertEqual(self.client.patch('/orders/999', headers=self.headers, json={'status': 'DELIVERED'}).status_code, 404)
 
     def test_validation(self):
@@ -93,7 +93,7 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(self.post([]).status_code, 422)
         self.assertEqual(self.client.patch('/orders/1', headers=self.headers, json={'status': 'NEW', 'customer_id': 2}).status_code, 422)
         self.assertEqual(self.client.patch('/orders/1', headers=self.headers, json={'status': 'PAID'}).status_code, 422)
-        self.assertEqual(self.client.get('/orders?customer_id=0').status_code, 422)
+        self.assertEqual(self.client.get('/orders?customer_id=0', headers=self.headers).status_code, 422)
 
     def test_api_key(self):
         for headers in [{}, {'X-API-Key': 'wrong'}]:
@@ -101,6 +101,18 @@ class OrderTests(unittest.TestCase):
             self.assertEqual(self.client.patch('/orders/1', headers=headers, json={'status': 'CANCELLED'}).status_code, 401)
         with patch.dict(os.environ, {'API_KEY': ''}):
             self.assertEqual(self.post([{'product_id': 1, 'quantity': 1}]).status_code, 401)
+
+    def test_get_orders_requires_api_key(self):
+        for url in ['/orders', '/orders?customer_id=1', '/orders/1']:
+            with self.subTest(url=url):
+                for headers in [{}, {'X-API-Key': ''}, {'X-API-Key': 'wrong'}]:
+                    response = self.client.get(url, headers=headers)
+                    self.assertEqual(response.status_code, 401)
+                response = self.client.get(url, headers=self.headers)
+                self.assertEqual(response.status_code, 200)
+                with patch.dict(os.environ, {'API_KEY': ''}):
+                    response = self.client.get(url, headers=self.headers)
+                    self.assertEqual(response.status_code, 401)
 
     def test_cancel_restores_stock_once(self):
         order = self.post([{'product_id': 1, 'quantity': 3}]).json()

@@ -195,12 +195,12 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
 
 
 
-@app.get("/orders")
+@app.get("/orders", dependencies=[Depends(require_api_key)])
 def get_orders(customer_id: int | None = Query(default=None, gt=0)):
     return database.list_orders(customer_id)
 
 
-@app.get("/orders/{order_id}")
+@app.get("/orders/{order_id}", dependencies=[Depends(require_api_key)])
 def get_order(order_id: int = FastApiPath(gt=0)):
     order = database.get_order(order_id)
     if order is None:
