@@ -3,9 +3,10 @@ from decimal import Decimal
 from json import dumps
 
 class Receipt_row:
-    def __init__(self, product_name: str, quantity: int, row_price: Decimal):
+    def __init__(self, product_name: str, quantity: int, unit_price: Decimal, row_price: Decimal):
         self.product_name = product_name
         self.quantity = quantity
+        self.unit_price = unit_price
         self.row_price = row_price
 
 class Receipt:

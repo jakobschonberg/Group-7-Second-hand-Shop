@@ -41,7 +41,7 @@ def get_receipt_from_db(order_id) -> list[dict]:
     with connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT o.order_date, oi.order_id, p.name, oi.quantity, oi.quantity * oi.unit_price AS row_price 
+            SELECT o.order_date, oi.order_id, p.name, oi.quantity, oi.unit_price, oi.quantity * oi.unit_price AS row_price 
             FROM order_items oi 
             JOIN orders o ON o.order_id = oi.order_id 
             JOIN products p ON p.product_id = oi.product_id 

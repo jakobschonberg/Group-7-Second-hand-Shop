@@ -188,6 +188,6 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
     row0 = receipt_rows[0]
     receipt = Receipt(row0["order_date"], row0["order_id"], [])
     for row in receipt_rows:
-        receipt.add_row(Receipt_row(row["name"], row["quantity"], row["row_price"]))
+        receipt.add_row(Receipt_row(row["name"], row["quantity"], row["unit_price"], row["row_price"]))
     return receipt
     
