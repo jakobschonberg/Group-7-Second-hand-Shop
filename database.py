@@ -30,12 +30,14 @@ def get_all_categories_from_db() -> list[dict]:
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
 
+
 def get_all_products_from_db() -> list[dict]:
     with connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM products")
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
+
 
 def imported_products_to_db(products, categories):
     with connection() as conn:
@@ -158,3 +160,23 @@ def search_product(product_id: int):
             return None
         print(f"{product} found")
         return dict(product)
+
+
+def list_products_not_part_of_orders():
+    with connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT p.product_id, p.name, c.name as category
+            FROM products p
+            JOIN categories c ON p.category_id = c.category_id 
+            WHERE NOT EXISTS (
+                SELECT 1 
+                FROM order_items oi
+                JOIN orders o ON oi.order_id = o.order_id 
+                WHERE oi.product_id = p.product_id AND o.status != 'CANCELLED'
+            )
+            ORDER BY p.product_id
+            """
+        ).fetchall()
+
+        return [dict(product) for product in rows]
