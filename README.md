@@ -34,10 +34,15 @@ The city of the customer, used for regional tracking and logistics.<br>
 Excluded Data (Privacy by Design):<br>
 We do not store full street addresses, personal identity numbers, or payment/credit card details in the database to minimize security risks and protect user privacy.
 
-To comply with GDPR's 'right to be forgotten', we have written a function that will delete or pseudonymize customers that requests this. The pseudonymization is used when a customer requests deletion but has an order newer than 7 years, this is to comply with the bokföringslag/BFL (1999:1078).<br>
-To comply with GDPR's 'right of access', we have created an endpoint that will, if authorized, show all the information stored about a singular customer.
+How GDPR requests are handled:<br>
+Because these administrative endpoints (deletion and data export) are protected by an X-Api-Key, they are designed to be used by store administrators or support staff on behalf of the customer, rather than as unprotected self-service endpoints. This prevents unauthorized exposure of personal data.
 
-By design most stored data should not be retrievable by unauthorized actors, confirmed by an api key. And access to personal customer data is authorized for the very few.
+Edge Case Handling (Mixed Orders):<br>
+In scenarios where a customer requests deletion and has a mix of orders—some older than 7 years and some newer—the system applies a hybrid approach to balance GDPR and BFL:
+
+The expired orders (older than 7 years) are permanently deleted to respect data minimization.
+
+The customer profile and any active orders (newer than 7 years) are pseudonymized rather than deleted, keeping the accounting records intact while stripping away the physical identity.
 
 ## ER Diagram
 <img width="1036" height="637" alt="image" src="https://github.com/user-attachments/assets/c3ee89e6-a47a-4ba7-996f-02a17eef3aeb" />

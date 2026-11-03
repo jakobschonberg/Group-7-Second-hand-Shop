@@ -113,18 +113,18 @@ def put_customer(customer: CustomerInput, customer_id: int = FastApiPath(gt=0)):
     return result
 
 
-@app.delete("/customers/{customer_id}", status_code=204,
+@app.delete("/customers/{customer_id}", status_code=200,
             dependencies=[Depends(require_api_key)])
 def remove_customer(customer_id: int = FastApiPath(gt=0)):
-    try:
-        deleted = database.delete_customer(customer_id)
-    except (ValueError, IntegrityError) as error:
-        raise HTTPException(
-            409, "Cannot delete customer because related records exist"
-        ) from error
-    if not deleted:
-        raise HTTPException(404, "Customer not found")
-    return Response(status_code=204)
+    action = database.delete_customer(customer_id)
+
+    if action == False:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    if action == "pseudonymized":
+        return {"message": "Customer has orders within the last seven years and was thus pseudonymized instead of deleted."}
+    else:
+        return {"message": "Customer had no orders within the last seven years and was permanently deleted."}
 
 
 @app.post("/products", dependencies=[Depends(require_api_key)], status_code=201)
