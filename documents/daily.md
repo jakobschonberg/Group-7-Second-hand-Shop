@@ -37,6 +37,7 @@ Yetnayet: Worked on the Manage Customers feature. Added validation for customer 
 Today I will test these operations locally and check that the customer fields match our shared database schema today.
 
 **DAY 3**
+
 Yetnayet: Testing customer API, discussed code review. Will follow up on code reviews.
 
 Jakob: Have been testing Yetnayet's code. Suggests to end sprint today and plan next one.
@@ -48,6 +49,7 @@ Alve: Spent yesterday with code review, worked a bit on export to DB code, and l
 Today we chose to rework the DB schema: EXPLAIN LOGICS BEHIND. Alve reworks his code to fit this. We plan to merge and finish the sprint later today.
 
 **DAY 4**
+
 Saranya: testing locally, issues with alves code in PR running in client
 together with alve and jakob to use same connection to database DATABASE_PATH
 
@@ -60,6 +62,7 @@ Yetnayet: seed.py and client database rest options.
 Today: discussing stuctural changes: is the fundamentals correct so we can move on and fix the minor functions? We are going to do another meeting after lunch.
 
 **Day 5** 
+
 Jakob: Work on order receipts and write user stories for splitting the menu program.
 
 Alve: Start code review #19 and continue working on his user story #11.
@@ -69,6 +72,7 @@ Saranya: Review the PR and continue working on statistics, especially products t
 Yetnayet: Address review feedback on task #19, test the category changes,
 
 **DAY 6** 
+
 Jakob: Created a pull request for order receipts, added receipt tests, and joined three database tables using SQL. And plan/offer to start work on new user story.
 
 Alve: Finished PR #30 and started working on a user story from the Ready section. Wants to take enough time to implement it correctly.
