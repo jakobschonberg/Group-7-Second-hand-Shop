@@ -87,7 +87,7 @@ def require_api_key(x_api_key: str | None = Header(default=None)):
         raise HTTPException(401, "Invalid or missing API key")
 
 
-@app.get("/customers", response_model=list[Customer])
+@app.get("/customers", response_model=list[Customer], dependencies=[Depends(require_api_key)])
 def get_customers():
     return database.list_customers()
 
@@ -180,7 +180,7 @@ def delete_product(product_id: int):
         raise HTTPException(
             status_code=409, detail="Cannot delete product because related records exist") from error
 
-@app.get("/orders/{order_id}/receipt")
+@app.get("/orders/{order_id}/receipt", dependencies=[Depends(require_api_key)])
 def get_receipt(order_id: int = FastApiPath(ge=0)):
     receipt_rows = database.get_receipt_from_db(order_id)
     if len(receipt_rows) == 0:
