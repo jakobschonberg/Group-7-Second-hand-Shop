@@ -73,7 +73,7 @@ class UpdateProduct(BaseModel):
     price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     stock: int | None = Field(default=None, ge=0)
 
-class OrderItemExport(BaseModel):
+class OrderItemsExport(BaseModel):
     name: str
     quantity: int
     unit_price: Decimal
@@ -82,7 +82,7 @@ class OrderExport(BaseModel):
     order_id: int
     status: str
     order_date: str
-    items: List[OrderItemExport]
+    items: List[OrderItemsExport]
 
 class CustomerDataExport(BaseModel):
     customer_id: int

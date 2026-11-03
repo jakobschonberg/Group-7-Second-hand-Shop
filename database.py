@@ -5,6 +5,7 @@ from contextlib import contextmanager
 import os
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 products = get_products_from_FakeStoreApi()
 categories = get_categories_from_FakeStoreApi()
@@ -118,7 +119,7 @@ def update_customer(customer_id, data):
         return {"customer_id": customer_id, **data}
 
 
-def delete_customer(customer_id): #### So... DELETE FROM order_items in this function could also be solved with somthing like ON DELETE CASCADE in db schema. I think. Not sure what is or if there is a "correct" way to solve this.
+def delete_customer(customer_id):
     with connection() as conn:
         conn.execute("BEGIN IMMEDIATE")
 
@@ -247,7 +248,43 @@ def get_customer_full_data(customer_id: int):
             "SELECT order_id, status, order_date FROM orders WHERE customer_id = ?",
             (customer_id,)
         ).fetchall()
-
         
-
+        if not order_rows:
+            customer_data["orders"] = []
+            return customer_data
+            
+        order_ids = [order["order_id"] for order in order_rows]
+        
+        placeholders = ",".join("?" for order_id in order_ids)
+        item_rows = conn.execute(
+            f"""
+                SELECT oi.order_id, p.name, oi.quantity, oi.unit_price 
+                FROM order_items oi
+                JOIN products p ON oi.product_id = p.product_id
+                WHERE oi.order_id IN ({placeholders})
+            """,
+            order_ids
+        ).fetchall()
+        
+        items_by_order = defaultdict(list)
+        
+        for item in item_rows:
+            items_by_order[item["order_id"]].append({
+                "name": item["name"],
+                "quantity": item["quantity"],
+                "unit_price": item["unit_price"]
+            })
+            
+        orders = []
+        for order in order_rows:
+            ord_id = order["order_id"]
+            orders.append({
+                "order_id": ord_id,
+                "status": order["status"],
+                "order_date": order["order_date"],
+                "items": items_by_order[ord_id]
+            })
+            
+        customer_data["orders"] = orders
+        
         return customer_data
