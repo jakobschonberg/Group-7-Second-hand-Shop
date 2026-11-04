@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import database
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
 from receipt import Receipt_row, Receipt
+from decimal import Decimal
 
 
 load_dotenv()
@@ -191,7 +192,7 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
     receipt = Receipt(row0["order_date"], row0["order_id"], [])
     for row in receipt_rows:
         receipt.add_row(Receipt_row(
-            row["name"], row["quantity"], row["unit_price"], row["row_price"]))
+            row["name"], row["quantity"], row["unit_price"], round(Decimal(row["row_price"]), 2)))
     return receipt
 
 
