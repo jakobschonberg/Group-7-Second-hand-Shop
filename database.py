@@ -3,9 +3,10 @@ import sqlite3
 from pathlib import Path
 from contextlib import contextmanager
 import os
-from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 from datetime import datetime, timedelta
 from collections import defaultdict
+from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
+
 
 products = get_products_from_FakeStoreApi()
 categories = get_categories_from_FakeStoreApi()
@@ -40,6 +41,7 @@ def get_all_products_from_db() -> list[dict]:
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
 
+
 def get_receipt_from_db(order_id) -> list[dict]:
     with connection() as conn:
         cursor = conn.cursor()
@@ -51,6 +53,7 @@ def get_receipt_from_db(order_id) -> list[dict]:
             WHERE oi.order_id = ? """, (order_id,))
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
+
 
 def imported_products_to_db(products, categories):
     with connection() as conn:
@@ -124,24 +127,26 @@ def delete_customer(customer_id):
         conn.execute("BEGIN IMMEDIATE")
 
         customer_exists = conn.execute(
-            "SELECT 1 FROM customers WHERE customer_id = ?", 
+            "SELECT 1 FROM customers WHERE customer_id = ?",
             (customer_id,)
         ).fetchone()
-        
+
         if not customer_exists:
             return False
-        
-        cutoff_date = (datetime.now() - timedelta(days=7*365)).strftime("%Y-%m-%d")
+
+        cutoff_date = (datetime.now() - timedelta(days=7*365)
+                       ).strftime("%Y-%m-%d")
 
         has_recent_orders = conn.execute(
             "SELECT 1 FROM orders WHERE customer_id = ? AND order_date >= ? LIMIT 1",
             (customer_id, cutoff_date)
         ).fetchone()
-        
+
         if has_recent_orders:
             conn.execute(
                 "UPDATE customers SET name = ?, email = ?, phone_no = ?, city = ? WHERE customer_id = ?",
-                ("Anonymiserad Kund", f"deleted_{customer_id}@anonymized.com", None, None, customer_id)
+                ("Anonymiserad Kund",
+                 f"deleted_{customer_id}@anonymized.com", None, None, customer_id)
             )
             conn.execute(
                 """
@@ -157,7 +162,7 @@ def delete_customer(customer_id):
                 (customer_id, cutoff_date)
             )
             return "pseudonymized"
-            
+
         else:
             conn.execute(
                 """
@@ -168,10 +173,13 @@ def delete_customer(customer_id):
                 """,
                 (customer_id,)
             )
-            conn.execute("DELETE FROM orders WHERE customer_id = ?", (customer_id,))
-            
-            cursor = conn.execute("DELETE FROM customers WHERE customer_id = ?", (customer_id,))
+            conn.execute(
+                "DELETE FROM orders WHERE customer_id = ?", (customer_id,))
+
+            cursor = conn.execute(
+                "DELETE FROM customers WHERE customer_id = ?", (customer_id,))
             return "deleted"
+
 
 def create_product(product: dict):
     with connection() as conn:
@@ -234,10 +242,12 @@ def list_products_not_part_of_orders():
 
         return [dict(product) for product in rows]
 
+
 def get_customer_full_data(customer_id: int):
     with connection() as conn:
 
-        customer_row = conn.execute("SELECT * FROM customers WHERE customer_id = ?", (customer_id,)).fetchone()
+        customer_row = conn.execute(
+            "SELECT * FROM customers WHERE customer_id = ?", (customer_id,)).fetchone()
 
         if not customer_row:
             return None
@@ -248,13 +258,13 @@ def get_customer_full_data(customer_id: int):
             "SELECT order_id, status, order_date FROM orders WHERE customer_id = ?",
             (customer_id,)
         ).fetchall()
-        
+
         if not order_rows:
             customer_data["orders"] = []
             return customer_data
-            
+
         order_ids = [order["order_id"] for order in order_rows]
-        
+
         placeholders = ",".join("?" for order_id in order_ids)
         item_rows = conn.execute(
             f"""
@@ -265,16 +275,16 @@ def get_customer_full_data(customer_id: int):
             """,
             order_ids
         ).fetchall()
-        
+
         items_by_order = defaultdict(list)
-        
+
         for item in item_rows:
             items_by_order[item["order_id"]].append({
                 "name": item["name"],
                 "quantity": item["quantity"],
                 "unit_price": item["unit_price"]
             })
-            
+
         orders = []
         for order in order_rows:
             ord_id = order["order_id"]
@@ -284,7 +294,7 @@ def get_customer_full_data(customer_id: int):
                 "order_date": order["order_date"],
                 "items": items_by_order[ord_id]
             })
-            
+
         customer_data["orders"] = orders
-        
+
         return customer_data
