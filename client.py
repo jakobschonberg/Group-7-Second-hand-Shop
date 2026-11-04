@@ -8,13 +8,17 @@ menu = {
     1: ("Quit", "my_quit"),
     2: ("Import products and categories", "import_products_and_categories_from_FakeStoreApi"),
     3: ("Reset database (replaces data with test data)", "reset_test_data"),
-    4: ("List products that never been sold", "list_products_never_sold")
+    4: ("List products that never been sold", "list_products_never_sold"),
+    5: ("List the revenue ordered by category", "fetch_revenue")
 }
 
 
 def my_quit():
+    url = f"http://{REST_API_URL}/revenue"
     pass
 
+def fetch_revenue():
+    pass
 
 def import_products_and_categories_from_FakeStoreApi():
     products = get_products_from_FakeStoreApi()
