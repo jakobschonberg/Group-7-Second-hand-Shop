@@ -28,7 +28,7 @@ def fetch_revenue():
     headers = {"X-API-Key": API_KEY}
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout = 2)
     
         if response.status_code == 200:
             data = response.json()
