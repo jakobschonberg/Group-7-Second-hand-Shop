@@ -91,3 +91,7 @@ class CustomerDataExport(BaseModel):
     phone_no: Optional[str] = None
     city: Optional[str] = None
     orders: List[OrderExport]
+
+class CategoryRevenue(BaseModel):
+    category: str
+    revenue: float

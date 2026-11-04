@@ -272,6 +272,7 @@ def get_customer_full_data(customer_id: int):
                 FROM order_items oi
                 JOIN products p ON oi.product_id = p.product_id
                 WHERE oi.order_id IN ({placeholders})
+                ORDER BY oi.order_id
             """,
             order_ids
         ).fetchall()
@@ -298,3 +299,22 @@ def get_customer_full_data(customer_id: int):
         customer_data["orders"] = orders
 
         return customer_data
+
+
+def get_revenue_per_category():
+    with connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT c.name AS category,ROUND(SUM(oi.unit_price * oi.quantity),2) AS revenue 
+            FROM products p
+            JOIN order_items oi ON oi.product_id = p.product_id
+            JOIN orders o ON oi.order_id = o.order_id
+            JOIN categories c ON p.category_id = c.category_id
+            WHERE o.status != 'CANCELLED'
+            GROUP BY c.category_id
+            ORDER BY revenue DESC
+
+            """
+        ).fetchall()
+
+    return [dict(row) for row in rows]
