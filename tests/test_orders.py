@@ -5,6 +5,7 @@ import sqlite3
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -133,17 +134,42 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(self.query('SELECT stock FROM products WHERE product_id=3'), [(0,)])
         self.assertEqual(self.client.patch(url, headers=self.headers, json={'status': 'CANCELLED'}).status_code, 409)
 
-    def test_two_orders_cannot_buy_last_item(self):
-        def buy():
-            try:
-                database.create_order({'customer_id': 1, 'items': [{'product_id': 3, 'quantity': 1}]})
-                return 'created'
-            except ValueError:
-                return 'no stock'
+    def buy_at_same_time(self):
+        ready = Barrier(2)
+
+        def buy(customer_id):
+            with TestClient(app) as api:
+                ready.wait(timeout=10)
+                return api.post('/orders', headers=self.headers, json={
+                    'customer_id': customer_id,
+                    'items': [{'product_id': 3, 'quantity': 1}],
+                })
+
         with ThreadPoolExecutor(max_workers=2) as pool:
-            results = list(pool.map(lambda _: buy(), range(2)))
-        self.assertCountEqual(results, ['created', 'no stock'])
+            return list(pool.map(buy, [1, 2]))
+
+    def test_two_orders_cannot_buy_last_item(self):
+        initial_count = self.query('SELECT count(*) FROM orders')[0][0]
+        responses = self.buy_at_same_time()
+        self.assertCountEqual([r.status_code for r in responses], [201, 409])
+        failed = next(r for r in responses if r.status_code == 409)
+        self.assertEqual(failed.json()['detail'],
+                         "Selected product is out of stock. Please continue shopping with other available products.")
         self.assertEqual(self.query('SELECT stock FROM products WHERE product_id=3'), [(0,)])
+        self.assertEqual(self.query('SELECT count(*) FROM orders'), [(initial_count + 1,)])
+        self.assertEqual(self.query('PRAGMA foreign_key_check'), [])
+
+    def test_two_customers_can_buy_two_available_items(self):
+        with closing(sqlite3.connect(self.path)) as conn:
+            conn.execute('UPDATE products SET stock=2 WHERE product_id=3')
+            conn.commit()
+        initial_count = self.query('SELECT count(*) FROM orders')[0][0]
+        responses = self.buy_at_same_time()
+        self.assertEqual([r.status_code for r in responses], [201, 201])
+        self.assertCountEqual([r.json()['customer_id'] for r in responses], [1, 2])
+        self.assertNotEqual(responses[0].json()['order_id'], responses[1].json()['order_id'])
+        self.assertEqual(self.query('SELECT stock FROM products WHERE product_id=3'), [(0,)])
+        self.assertEqual(self.query('SELECT count(*) FROM orders'), [(initial_count + 2,)])
         self.assertEqual(self.query('PRAGMA foreign_key_check'), [])
 
 

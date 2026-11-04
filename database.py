@@ -307,6 +307,10 @@ def create_order(data):
             ).fetchone()
             if product is None:
                 raise LookupError(f"Product {product_id} not found")
+            if product["stock"] == 0:
+                raise ValueError(
+                    "Selected product is out of stock. Please continue shopping with other available products."
+                )
             if product["stock"] < quantity:
                 raise ValueError(f"Not enough stock for product {product_id}")
             conn.execute(
