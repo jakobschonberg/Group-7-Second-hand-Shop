@@ -35,8 +35,6 @@ def fetch_revenue():
         return
         
     data = response.json()
-
-    print(data)
     
     print("\n--- Report: Revenue per category ---")
     for row in data:
