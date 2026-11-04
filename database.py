@@ -39,6 +39,7 @@ def get_all_products_from_db() -> list[dict]:
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
 
+
 def get_receipt_from_db(order_id) -> list[dict]:
     with connection() as conn:
         cursor = conn.cursor()
@@ -50,6 +51,7 @@ def get_receipt_from_db(order_id) -> list[dict]:
             WHERE oi.order_id = ? """, (order_id,))
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
+
 
 def imported_products_to_db(products, categories):
     with connection() as conn:
@@ -118,29 +120,32 @@ def update_customer(customer_id, data):
         return {"customer_id": customer_id, **data}
 
 
-def delete_customer(customer_id): #### So... DELETE FROM order_items in this function could also be solved with somthing like ON DELETE CASCADE in db schema. I think. Not sure what is or if there is a "correct" way to solve this.
+# So... DELETE FROM order_items in this function could also be solved with somthing like ON DELETE CASCADE in db schema. I think. Not sure what is or if there is a "correct" way to solve this.
+def delete_customer(customer_id):
     with connection() as conn:
         conn.execute("BEGIN IMMEDIATE")
 
         customer_exists = conn.execute(
-            "SELECT 1 FROM customers WHERE customer_id = ?", 
+            "SELECT 1 FROM customers WHERE customer_id = ?",
             (customer_id,)
         ).fetchone()
-        
+
         if not customer_exists:
             return False
-        
-        cutoff_date = (datetime.now() - timedelta(days=7*365)).strftime("%Y-%m-%d")
+
+        cutoff_date = (datetime.now() - timedelta(days=7*365)
+                       ).strftime("%Y-%m-%d")
 
         has_recent_orders = conn.execute(
             "SELECT 1 FROM orders WHERE customer_id = ? AND order_date >= ? LIMIT 1",
             (customer_id, cutoff_date)
         ).fetchone()
-        
+
         if has_recent_orders:
             conn.execute(
                 "UPDATE customers SET name = ?, email = ?, phone_no = ?, city = ? WHERE customer_id = ?",
-                ("Anonymiserad Kund", f"deleted_{customer_id}@anonymized.com", None, None, customer_id)
+                ("Anonymiserad Kund",
+                 f"deleted_{customer_id}@anonymized.com", None, None, customer_id)
             )
             conn.execute(
                 """
@@ -156,7 +161,7 @@ def delete_customer(customer_id): #### So... DELETE FROM order_items in this fun
                 (customer_id, cutoff_date)
             )
             return "pseudonymized"
-            
+
         else:
             conn.execute(
                 """
@@ -167,10 +172,13 @@ def delete_customer(customer_id): #### So... DELETE FROM order_items in this fun
                 """,
                 (customer_id,)
             )
-            conn.execute("DELETE FROM orders WHERE customer_id = ?", (customer_id,))
-            
-            cursor = conn.execute("DELETE FROM customers WHERE customer_id = ?", (customer_id,))
+            conn.execute(
+                "DELETE FROM orders WHERE customer_id = ?", (customer_id,))
+
+            cursor = conn.execute(
+                "DELETE FROM customers WHERE customer_id = ?", (customer_id,))
             return "deleted"
+
 
 def create_product(product: dict):
     with connection() as conn:
@@ -334,3 +342,22 @@ def update_order_status(order_id, status):
             (status, order_id)
         )
         return read_order(conn, order_id)
+
+
+def get_revenue_per_category():
+    with connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT c.name AS category,ROUND(SUM(oi.unit_price * oi.quantity),2) AS revenue 
+            FROM products p
+            JOIN order_items oi ON oi.product_id = p.product_id
+            JOIN orders o ON oi.order_id = o.order_id
+            JOIN categories c ON p.category_id = c.category_id
+            WHERE o.status != 'CANCELLED'
+            GROUP BY c.category_id
+            ORDER BY revenue DESC
+
+            """
+        ).fetchall()
+
+    return [dict(row) for row in rows]

@@ -90,3 +90,8 @@ class OrderInput(BaseModel):
 class OrderStatusUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["NEW", "DELIVERED", "CANCELLED"]
+
+
+class CategoryRevenue(BaseModel):
+    category: str
+    revenue: float

@@ -44,6 +44,7 @@ class OrderTests(unittest.TestCase):
         })
 
     def test_single_order_and_saved_price(self):
+        initial_count = self.query('SELECT count(*) FROM orders')[0][0]
         response = self.post([{'product_id': 1, 'quantity': 2}])
         self.assertEqual(response.status_code, 201)
         order = response.json()
@@ -57,7 +58,7 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(saved['items'][0]['unit_price'], 50)
         filtered = self.client.get('/orders?customer_id=1', headers=self.headers).json()
         self.assertTrue(all(row['customer_id'] == 1 for row in filtered))
-        self.assertEqual(len(self.client.get('/orders', headers=self.headers).json()), 5)
+        self.assertEqual(len(self.client.get('/orders', headers=self.headers).json()), initial_count + 1)
 
     def test_multiple_products_and_repeated_product(self):
         response = self.post([
@@ -70,6 +71,8 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(self.query('SELECT stock FROM products WHERE product_id IN (1,3) ORDER BY product_id'), [(5,), (0,)])
 
     def test_failure_rolls_back_everything(self):
+        initial_orders = self.query('SELECT * FROM orders ORDER BY order_id')
+        initial_items = self.query('SELECT * FROM order_items ORDER BY order_id, product_id')
         for second_id, quantity, status in [(2, 1, 409), (999, 1, 404), (1, 10, 409)]:
             with self.subTest(second_id=second_id):
                 response = self.post([
@@ -77,8 +80,8 @@ class OrderTests(unittest.TestCase):
                     {'product_id': second_id, 'quantity': quantity},
                 ])
                 self.assertEqual(response.status_code, status)
-                self.assertEqual(self.query('SELECT count(*) FROM orders'), [(4,)])
-                self.assertEqual(self.query('SELECT count(*) FROM order_items'), [(5,)])
+                self.assertEqual(self.query('SELECT * FROM orders ORDER BY order_id'), initial_orders)
+                self.assertEqual(self.query('SELECT * FROM order_items ORDER BY order_id, product_id'), initial_items)
                 self.assertEqual(self.query('SELECT stock FROM products WHERE product_id=1'), [(10,)])
 
     def test_missing_resources(self):
