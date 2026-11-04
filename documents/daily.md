@@ -81,4 +81,18 @@ Yetnayet: Working on the Place Order user story and plans to finish it today.
 
 Saranya: Plans to merge the pull request for products that have never been sold. Continuing with revenue calculations and expects to finish today.
 
-Today Discussion: Four user stories were still remaining. We discussed how to distribute them and agreed that each team member would take one story. The team aims to finish the remaining work by Wednesday afternoon.
+Today’s Discussion: Four user stories were still remaining. We discussed how to distribute them and agreed that each team member would take one story. The team aims to finish the remaining work by Wednesday afternoon.
+
+**Day 7** 
+ 
+Saranya: Merged the revenue user story and is continuing work on product functionality, including updating and deleting products. Plans to finish today.
+ 
+Yetnayet: Created a pull request for the Place Order user story and is waiting for review. Will respond to any feedback and start working on the new user story, Creating Products via API,
+ 
+Jakob: Reviewing pull requests and almost finished reviewing the Place Order feature. Will continue reviewing code and checking the remaining project requirements.
+ 
+Alve: Working on his current pull request and expects to finish today. Has one task remaining.
+ 
+Today’s Discussion: Discussed unit tests and importance in preventing future problems. Agreed to review the remaining project requirements and ensure everything is completed.
+
+Team Goal: Complete the remaining tasks today, review pull requests, and be prepared for Sprint Review 2 tomorrow.
