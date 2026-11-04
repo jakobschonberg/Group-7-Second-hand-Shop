@@ -270,6 +270,11 @@ def list_orders(customer_id=None):
                 "SELECT order_id FROM orders ORDER BY order_id"
             ).fetchall()
         else:
+            customer = conn.execute(
+                "SELECT 1 FROM customers WHERE customer_id = ?", (customer_id,)
+            ).fetchone()
+            if customer is None:
+                raise LookupError("Customer not found")
             rows = conn.execute(
                 "SELECT order_id FROM orders WHERE customer_id = ? "
                 "ORDER BY order_id", (customer_id,)

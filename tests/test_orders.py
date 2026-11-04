@@ -88,8 +88,24 @@ class OrderTests(unittest.TestCase):
     def test_missing_resources(self):
         self.assertEqual(self.post([{'product_id': 1, 'quantity': 1}], 999).status_code, 404)
         self.assertEqual(self.client.get('/orders/999', headers=self.headers).status_code, 404)
-        self.assertEqual(self.client.get('/orders?customer_id=999', headers=self.headers).json(), [])
+        response = self.client.get('/orders?customer_id=999', headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {'detail': 'Customer not found'})
         self.assertEqual(self.client.patch('/orders/999', headers=self.headers, json={'status': 'DELIVERED'}).status_code, 404)
+
+    def test_customer_without_orders(self):
+        with closing(sqlite3.connect(self.path)) as conn:
+            cursor = conn.execute(
+                "INSERT INTO customers (name, email) VALUES (?, ?)",
+                ("No orders", "no-orders@example.com")
+            )
+            customer_id = cursor.lastrowid
+            conn.commit()
+        response = self.client.get(
+            f'/orders?customer_id={customer_id}', headers=self.headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
 
     def test_validation(self):
         for quantity in [0, -1, 1.5, True, '2']:

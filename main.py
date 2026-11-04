@@ -198,7 +198,10 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
 
 @app.get("/orders", dependencies=[Depends(require_api_key)])
 def get_orders(customer_id: int | None = Query(default=None, gt=0)):
-    return database.list_orders(customer_id)
+    try:
+        return database.list_orders(customer_id)
+    except LookupError as error:
+        raise HTTPException(404, str(error)) from error
 
 
 @app.get("/orders/{order_id}", dependencies=[Depends(require_api_key)])
