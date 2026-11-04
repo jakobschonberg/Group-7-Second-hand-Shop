@@ -2,7 +2,14 @@ import sqlite3
 from seed import reset_database
 from database import imported_products_to_db, list_products_not_part_of_orders
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
+import os
+import requests
+from dotenv import load_dotenv
 
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+REST_API_URL = os.getenv("REST_API_URL", "127.0.0.1:8000")
 
 menu = {
     1: ("Quit", "my_quit"),
@@ -14,10 +21,28 @@ menu = {
 
 
 def my_quit():
-    url = f"http://{REST_API_URL}/revenue"
     pass
 
 def fetch_revenue():
+    url = f"http://{REST_API_URL}/reports/revenue"
+    headers = {"X-API-Key": API_KEY}
+
+    try:
+        response = requests.get(url, headers=headers)
+    
+        if response.status_code == 200:
+            data = response.json()
+            print("\n- Report: revenue per category -")
+            for row in data:
+                print(f"Category: {row['category']} | Revenue: ${row['revenue']} (USD)")
+            print("-------------------------------\n")
+        elif response.status_code == 401:
+            print("Error: incorrect or missing API-key.")
+        else:
+            print(f"Error: {response.status_code}: {response.text}")
+            
+    except requests.exceptions.ConnectionError:
+        print(f"Could not connect to {REST_API_URL}. Is the server running?")
     pass
 
 def import_products_and_categories_from_FakeStoreApi():
