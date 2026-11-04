@@ -5,16 +5,23 @@ from contextlib import contextmanager
 import os
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 products = get_products_from_FakeStoreApi()
 categories = get_categories_from_FakeStoreApi()
 
+class DecimalRow(sqlite3.Row):
+    def __getitem__(self, key):
+        value = super().__getitem__(key)
+        if key in ['price', 'unit_price', 'row_price', 'revenue']:
+            return Decimal(str(value))        
+        return value
 
 @contextmanager
 def connection():
     path = Path(os.getenv("DATABASE_PATH", "shop.db")).resolve()
-    conn = sqlite3.connect(path.as_uri() + "?mode=rw", uri=True)
-    conn.row_factory = sqlite3.Row
+    conn = sqlite3.connect(path.as_uri() + "?mode=rw", uri=True, detect_types=sqlite3.PARSE_DECLTYPES)
+    conn.row_factory = DecimalRow
     conn.execute("PRAGMA foreign_keys = ON")
     try:
         with conn:
@@ -44,7 +51,7 @@ def get_receipt_from_db(order_id) -> list[dict]:
     with connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT o.order_date, oi.order_id, p.name, oi.quantity, oi.unit_price, oi.quantity * oi.unit_price AS row_price 
+            SELECT o.order_date, oi.order_id, p.name, oi.quantity, oi.unit_price, cast(oi.quantity * oi.unit_price as decimal(10,2)) AS row_price 
             FROM order_items oi 
             JOIN orders o ON o.order_id = oi.order_id 
             JOIN products p ON p.product_id = oi.product_id 
@@ -246,7 +253,7 @@ def get_revenue_per_category():
     with connection() as conn:
         rows = conn.execute(
             """
-            SELECT c.name AS category,ROUND(SUM(oi.unit_price * oi.quantity),2) AS revenue 
+            SELECT c.name AS category,CAST(ROUND(SUM(oi.unit_price * oi.quantity),2) AS DECIMAL(10,2)) AS revenue 
             FROM products p
             JOIN order_items oi ON oi.product_id = p.product_id
             JOIN orders o ON oi.order_id = o.order_id

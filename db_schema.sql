@@ -10,7 +10,7 @@ CREATE TABLE products (
             product_id INTEGER PRIMARY KEY,
             category_id INTEGER NOT NULL,
             name TEXT NOT NULL UNIQUE,
-            price REAL NOT NULL CHECK (price >= 0.0),
+            price NUMERIC NOT NULL CHECK (price >= 0.0),
             stock INTEGER NOT NULL CHECK (stock >= 0),
             FOREIGN KEY(category_id) REFERENCES categories(category_id)
 );
@@ -34,7 +34,7 @@ CREATE TABLE orders(
 CREATE TABLE order_items(
     order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
-    unit_price REAL NOT NULL,
+    unit_price NUMERIC NOT NULL,
     quantity INTEGER NOT NULL CHECK (quantity > 0),
 	FOREIGN KEY(order_id) REFERENCES orders(order_id),
 	FOREIGN KEY(product_id) REFERENCES products(product_id)

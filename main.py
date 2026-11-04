@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import database
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
 from receipt import Receipt_row, Receipt
+from decimal import Decimal
 
 
 load_dotenv()
@@ -34,8 +35,8 @@ def products_with_category_names(categories) -> list[dict]:
 @app.get("/products")
 def get_products(name: str | None = Query(default=None, min_length=2),
                  category: str | None = Query(default=None, min_length=2),
-                 minimum_price: float | None = Query(default=None),
-                 maximum_price: float | None = Query(default=None),
+                 minimum_price: Decimal | None = Query(default=None),
+                 maximum_price: Decimal | None = Query(default=None),
                  in_stock: bool | None = Query(default=False),
                  sort_by: Literal["name", "price", "category_name"] = "name",
                  order: Literal["asc", "desc"] = "asc",
@@ -198,6 +199,8 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
 @app.get("/reports/revenue", dependencies=[Depends(require_api_key)], response_model=list[CategoryRevenue])
 def get_revenue():
     try:
+        result = database.get_revenue_per_category()
+        print(result, type(result))
         return database.get_revenue_per_category()
     except Error as error:
         raise HTTPException(
