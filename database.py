@@ -262,6 +262,7 @@ def get_customer_full_data(customer_id: int):
                 FROM order_items oi
                 JOIN products p ON oi.product_id = p.product_id
                 WHERE oi.order_id IN ({placeholders})
+                ORDER BY oi.order_id
             """,
             order_ids
         ).fetchall()
