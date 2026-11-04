@@ -70,11 +70,11 @@ Do not push your `.env` or database files to GitHub.
 
 The test data includes:
 
-- 3 categories
-- 5 products
+- 4 categories
+- 6 products
 - 4 customers
-- 4 orders
-- 5 order items
+- 8 orders
+- 10 order items
 
 We included examples like a product with no stock, a product with a price of zero,
 and a customer with no phone number or city. There are also orders with different

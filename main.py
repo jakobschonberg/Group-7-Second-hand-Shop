@@ -1,14 +1,12 @@
 from os import getenv
-from secrets import compare_digest
-from sqlite3 import IntegrityError
-from fastapi import FastAPI, HTTPException, Response, Header, Depends, Query, Path as FastApiPath
 from typing import Literal
-from fastapi import Header, Depends
-import database
-from models import Customer, CustomerInput, CreateProduct, UpdateProduct
+from secrets import compare_digest
+from sqlite3 import IntegrityError, Error
+from fastapi import FastAPI, HTTPException, Header, Depends, Query, Path as FastApiPath
 from dotenv import load_dotenv
+import database
+from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
 from receipt import Receipt_row, Receipt
-from datetime import datetime
 
 
 load_dotenv()
@@ -20,15 +18,18 @@ def lowercase(obj):
         return obj.lower()
     return obj
 
+
 def products_with_category_names(categories) -> list[dict]:
     products = database.get_all_products_from_db()
     for product in products:
-        product_category = next((cat for cat in categories if product["category_id"] == cat["category_id"]), None)
+        product_category = next(
+            (cat for cat in categories if product["category_id"] == cat["category_id"]), None)
         if product_category:
             product["category_name"] = product_category["name"]
         else:
             product["category_name"] = "(unknown)"
     return products
+
 
 @app.get("/products")
 def get_products(name: str | None = Query(default=None, min_length=2),
@@ -180,6 +181,7 @@ def delete_product(product_id: int):
         raise HTTPException(
             status_code=409, detail="Cannot delete product because related records exist") from error
 
+
 @app.get("/orders/{order_id}/receipt", dependencies=[Depends(require_api_key)])
 def get_receipt(order_id: int = FastApiPath(ge=0)):
     receipt_rows = database.get_receipt_from_db(order_id)
@@ -188,6 +190,15 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
     row0 = receipt_rows[0]
     receipt = Receipt(row0["order_date"], row0["order_id"], [])
     for row in receipt_rows:
-        receipt.add_row(Receipt_row(row["name"], row["quantity"], row["unit_price"], row["row_price"]))
+        receipt.add_row(Receipt_row(
+            row["name"], row["quantity"], row["unit_price"], row["row_price"]))
     return receipt
-    
+
+
+@app.get("/reports/revenue", dependencies=[Depends(require_api_key)], response_model=list[CategoryRevenue])
+def get_revenue():
+    try:
+        return database.get_revenue_per_category()
+    except Error as error:
+        raise HTTPException(
+            status_code=500, detail="Could not read revenue data") from error
