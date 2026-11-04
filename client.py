@@ -81,21 +81,16 @@ def list_products_page():
             print("No products available in store now")
             return
 
-        print(f"Page {current_page} of {total_pages}")
-        print(
-            f"{"No":^5} {"Name":<50} {"Category":<20} {"Price":^10} {"Stock":^10}")
-        for line_item, product in enumerate(products, 1):
-            print(
-                f"{line_item:^5} {product["name"]:<50} {product["category_name"]:<20} {product["price"]:^10} {product["stock"]:^10}")
+        display_products_table(total_pages, current_page, products)
 
         choice = input(" ".join(options) + ":").strip().lower()
-        if choice == 'n':
+        if choice == "n":
             has_next = offset + PAGE_SIZE < total
             if (has_next):
                 offset = offset + PAGE_SIZE
             else:
                 print("No next page")
-        elif choice == 'p':
+        elif choice == "p":
             has_prev = offset > 0
             if (has_prev):
                 offset = offset - PAGE_SIZE
@@ -108,25 +103,86 @@ def list_products_page():
             else:
                 print("No product with that number")
 
-        elif choice == 'b':
+        elif choice == "b":
             return
         else:
             print("Invalid choice")
 
 
+def display_products_table(total_pages, current_page, products):
+    print(f"Page {current_page} of {total_pages}")
+    print(
+        f"{"No":^5} {"Name":<50} {"Category":<20} {"Price":^10} {"Stock":^10}")
+    for line_item, product in enumerate(products, 1):
+        print(
+            f"{line_item:^5} {product["name"]:<50} {product["category_name"]:<20} {product["price"]:^10} {product["stock"]:^10}")
+
+
 def select_product(product):
     print(f"Selected: {product["name"]} (price {product["price"]})")
-    options = ["[C]hange price", "[D]elete", "[B]ack"]
+    options = ["[U]pdate price", "[D]elete", "[B]ack"]
     choice = input(" ".join(options) + ":").strip().lower()
 
-    if choice == 'c':
-        print("change price - yet to be iplemented")
-    elif choice == 'd':
-        print("delete - yet to be implemented")
-    elif choice == 'b':
+    if choice == "u":
+        update_product_price(product)
+
+    elif choice == "d":
+        delete_selected_product(product)
+        return
+
+    elif choice == "b":
         return
     else:
         print("Invalid choice")
+
+
+def update_product_price(product):
+    try:
+        new_price = float(input("Enter new price: ").strip())
+        if not math.isfinite(new_price) or new_price < 0:
+            raise ValueError
+    except ValueError:
+        print("Price must be 0 or more")
+        return
+
+    response = shop_api_client.change_price(
+        product["product_id"], new_price)
+
+    if response is None:
+        return
+    status_code = response.status_code
+    if status_code == 200:
+        print("Product updated successfully")
+    elif status_code == 404:
+        print("Product not found")
+    elif status_code == 401:
+        print("Unauthorized")
+    elif status_code == 422:
+        print("Invalid price")
+    else:
+        print("Product update not successful")
+
+
+def delete_selected_product(product):
+    confirm = input(
+        f"Do you really want to delete the product {product["name"]}. Type 'yes' to continue : ").strip().lower()
+    if confirm in ("yes", "y"):
+        response = shop_api_client.delete_product(product["product_id"])
+        if response is None:
+            return
+        status_code = response.status_code
+        if status_code == 204:
+            print("Product deleted successfully")
+        elif status_code == 404:
+            print("Product not found")
+        elif status_code == 401:
+            print("Unauthorized")
+        elif status_code == 409:
+            print("Product cannot be deleted. Related records exist")
+        else:
+            print("product deletion not successful")
+    else:
+        print("Delete Cancelled")
 
 
 def main():
