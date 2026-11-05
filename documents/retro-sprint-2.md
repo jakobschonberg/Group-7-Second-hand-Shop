@@ -20,7 +20,7 @@ Y : We helped each other, reviewed the code, and worked together to finish our u
 
 **What is slowing us down, what should we stop:**
 
-A (Alve): Reviewing almost everything multiple times slowed down our progress, although it was useful for learning. Some project requirements also required us to work at a slower pace.
+A : Reviewing almost everything multiple times slowed down our progress, although it was useful for learning. Some project requirements also required us to work at a slower pace.
 
 S : Different naming conventions and settings on each machine caused problems. Sometimes something worked on one person's machine but not on another.
 
