@@ -1,18 +1,14 @@
 from os import getenv
 from typing import Literal
-from fastapi import Header, Depends
-import database
-from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CustomerDataExport
 from secrets import compare_digest
 from sqlite3 import IntegrityError, Error
 from fastapi import FastAPI, HTTPException, Header, Depends, Query, Path as FastApiPath
-from models import OrderInput, OrderStatusUpdate
+from decimal import Decimal
 from dotenv import load_dotenv
 import database
-from models import CategoryInput
-from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
+import models
 from receipt import Receipt_row, Receipt
-from decimal import Decimal
+
 
 
 load_dotenv()
@@ -94,23 +90,23 @@ def require_api_key(x_api_key: str | None = Header(default=None)):
         raise HTTPException(401, "Invalid or missing API key")
 
 
-@app.get("/customers", response_model=list[Customer], dependencies=[Depends(require_api_key)])
+@app.get("/customers", response_model=list[models.Customer], dependencies=[Depends(require_api_key)])
 def get_customers():
     return database.list_customers()
 
 
-@app.post("/customers", response_model=Customer, status_code=201,
+@app.post("/customers", response_model=models.Customer, status_code=201,
           dependencies=[Depends(require_api_key)])
-def post_customer(customer: CustomerInput):
+def post_customer(customer: models.CustomerInput):
     try:
         return database.create_customer(customer.model_dump())
     except IntegrityError as error:
         raise HTTPException(409, "Customer data conflict") from error
 
 
-@app.put("/customers/{customer_id}", response_model=Customer,
+@app.put("/customers/{customer_id}", response_model=models.Customer,
          dependencies=[Depends(require_api_key)])
-def put_customer(customer: CustomerInput, customer_id: int = FastApiPath(gt=0)):
+def put_customer(customer: models.CustomerInput, customer_id: int = FastApiPath(gt=0)):
     try:
         result = database.update_customer(customer_id, customer.model_dump())
     except IntegrityError as error:
@@ -135,7 +131,7 @@ def remove_customer(customer_id: int = FastApiPath(gt=0)):
 
 
 @app.post("/products", dependencies=[Depends(require_api_key)], status_code=201)
-def create_products(product: CreateProduct):
+def create_products(product: models.CreateProduct):
     new_product = {
         "name": product.name,
         "category_id": product.category_id,
@@ -158,7 +154,7 @@ def create_products(product: CreateProduct):
 
 
 @app.patch("/products/{product_id}", dependencies=[Depends(require_api_key)])
-def update_product(changes: UpdateProduct, product_id: int):
+def update_product(changes: models.UpdateProduct, product_id: int):
     try:
         existing_product = database.search_product(product_id)
         if existing_product is None:
@@ -200,7 +196,7 @@ def get_receipt(order_id: int = FastApiPath(ge=0)):
             row["name"], row["quantity"], row["unit_price"], round(Decimal(row["row_price"]), 2)))
     return receipt
     
-@app.get("/customers/{customer_id}/data", response_model=CustomerDataExport, dependencies=[Depends(require_api_key)])
+@app.get("/customers/{customer_id}/data", response_model=models.CustomerDataExport, dependencies=[Depends(require_api_key)])
 def get_customer_data_export(customer_id: int):
     customer_data = database.get_customer_full_data(customer_id)
     
@@ -231,7 +227,7 @@ def get_order(order_id: int = FastApiPath(gt=0)):
 
 @app.post("/orders", status_code=201,
           dependencies=[Depends(require_api_key)])
-def post_order(order: OrderInput):
+def post_order(order: models.OrderInput):
     try:
         return database.create_order(order.model_dump())
     except LookupError as error:
@@ -241,7 +237,7 @@ def post_order(order: OrderInput):
 
 
 @app.patch("/orders/{order_id}", dependencies=[Depends(require_api_key)])
-def patch_order(changes: OrderStatusUpdate, order_id: int = FastApiPath(gt=0)):
+def patch_order(changes: models.OrderStatusUpdate, order_id: int = FastApiPath(gt=0)):
     try:
         return database.update_order_status(order_id, changes.status)
     except LookupError as error:
@@ -252,7 +248,7 @@ def patch_order(changes: OrderStatusUpdate, order_id: int = FastApiPath(gt=0)):
 
 
 
-@app.get("/reports/revenue", dependencies=[Depends(require_api_key)], response_model=list[CategoryRevenue])
+@app.get("/reports/revenue", dependencies=[Depends(require_api_key)], response_model=list[models.CategoryRevenue])
 def get_revenue():
     try:
         return database.get_revenue_per_category()
@@ -262,5 +258,5 @@ def get_revenue():
 
 
 @app.post("/categories", dependencies=[Depends(require_api_key)])
-def post_category(category: CategoryInput):
+def post_category(category: models.CategoryInput):
     return database.get_or_create_category(category.name)

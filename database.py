@@ -1,8 +1,8 @@
 # connection to SQL queries
 import sqlite3
-from pathlib import Path
+from pathlib import Path as pathlibPath
 from contextlib import contextmanager
-import os
+from os import getenv
 from datetime import datetime, timedelta
 from collections import defaultdict
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
@@ -14,7 +14,7 @@ categories = get_categories_from_FakeStoreApi()
 
 @contextmanager
 def connection():
-    path = Path(os.getenv("DATABASE_PATH", "shop.db")).resolve()
+    path = pathlibPath(getenv("DATABASE_PATH", "shop.db")).resolve()
     conn = sqlite3.connect(path.as_uri() + "?mode=rw", uri=True)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")

@@ -1,6 +1,5 @@
 from datetime import datetime
 from decimal import Decimal
-from json import dumps
 
 class Receipt_row:
     def __init__(self, product_name: str, quantity: int, unit_price: Decimal, row_price: Decimal):

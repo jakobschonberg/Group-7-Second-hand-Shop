@@ -1,30 +1,22 @@
 import shop_api_client
-import math
-import sqlite3
-import os
-import math
+from os import getenv
+from math import ceil, isfinite
 import requests
-from pathlib import Path
+from pathlib import Path as pathlibPath
 from dotenv import load_dotenv
-from seed import reset_database
-from database import imported_products_to_db, list_products_not_part_of_orders
-from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 from util import get_request
 
 load_dotenv()
 
-API_KEY = os.getenv("API_KEY")
-REST_API_URL = os.getenv("REST_API_URL", "127.0.0.1:8000")
+API_KEY = getenv("API_KEY")
+REST_API_URL = getenv("REST_API_URL", "127.0.0.1:8000")
 PAGE_SIZE = 2
 
 menu = {
     1: ("Quit", "my_quit"),
-    2: ("Import products and categories", "import_products_and_categories_from_FakeStoreApi"),
-    3: ("Reset database (replaces data with test data)", "reset_test_data"),
-    4: ("List products that never been sold", "list_products_never_sold"),
-    5: ("List the revenue ordered by category", "fetch_revenue"),
-    6: ("List all products", "list_products_page"),
-    7: ("Create product via API", "create_product_via_api")
+    2: ("List the revenue ordered by category", "fetch_revenue"),
+    3: ("List all products", "list_products_page"),
+    4: ("Create product via API", "create_product_via_api")
 }
 
 
@@ -50,51 +42,11 @@ def fetch_revenue():
     print("------------------------------------\n")
 
 
-def import_products_and_categories_from_FakeStoreApi():
-    products = get_products_from_FakeStoreApi()
-    categories = get_categories_from_FakeStoreApi()
-    imported_products_to_db(products, categories)
-
-
-def reset_test_data():
-    confirmation = input(
-        'This deletes all data in the five shop tables. Type "yes" to continue: '
-    )
-    if confirmation.strip().lower() != 'yes':
-        print("Reset cancelled.")
-        return
-
-    try:
-        path = reset_database()
-    except (sqlite3.Error, OSError) as error:
-        print(f"Could not reset database: {error}")
-    else:
-        print(f"Database reset with test data: {path}")
-
-
-def list_products_never_sold():
-    try:
-        products = list_products_not_part_of_orders()
-
-    except sqlite3.Error as error:
-        print(f"Database Error: {error}")
-        return
-
-    if not products:
-        print("No products found")
-        return
-
-    print(
-        f"{"product_id":^15} {"name":<100} {"category":<10}")
-    for product in products:
-        print(
-            f"{product["product_id"]:^15} {product["name"]:<100} {product["category"]:<10}")
-
 
 def create_product_via_api():
-    load_dotenv(Path(__file__).resolve().parent / ".env")
-    api_key = os.getenv("API_KEY", "").strip()
-    api_url = os.getenv("REST_API_URL", "127.0.0.1:8000").strip().rstrip("/")
+    load_dotenv(pathlibPath(__file__).resolve().parent / ".env")
+    api_key = getenv("API_KEY", "").strip()
+    api_url = getenv("REST_API_URL", "127.0.0.1:8000").strip().rstrip("/")
     if not api_url.startswith(("http://", "https://")):
         api_url = "http://" + api_url
     if not api_key:
@@ -112,7 +64,7 @@ def create_product_via_api():
     if not name or not category_name or len(name) > 100 or len(category_name) > 100:
         print("Product and category names must contain 1 to 100 characters.")
         return
-    if not math.isfinite(price) or price < 0 or stock < 0:
+    if not isfinite(price) or price < 0 or stock < 0:
         print("Price and stock must be zero or greater, and price must be finite.")
         return
 
@@ -163,7 +115,7 @@ def list_products_page():
             return
 
         total = products_page["total"]
-        total_pages = math.ceil(total/PAGE_SIZE)
+        total_pages = ceil(total/PAGE_SIZE)
         current_page = offset // PAGE_SIZE + 1
 
         products = products_page["products"]
@@ -232,7 +184,7 @@ def select_product(product):
 def update_product_price(product):
     try:
         new_price = float(input("Enter new price: ").strip())
-        if not math.isfinite(new_price) or new_price < 0:
+        if not isfinite(new_price) or new_price < 0:
             raise ValueError
     except ValueError:
         print("Price must be 0 or more")
