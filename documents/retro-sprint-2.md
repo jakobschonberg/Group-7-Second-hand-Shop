@@ -1,14 +1,14 @@
-NOTES from retrospective/review of Sprint 2 
+**NOTES from retrospective/review of Sprint 2**
 
 * We improved our communication and teamwork throughout the sprint.
 * Everyone became more comfortable working with Git, creating pull requests, reviewing code, merging, and resolving conflicts.
-* We reviewed almost every pull request, which helped us identify bugs and learn from each other.
+* We reviewed pull request, which helped us identify bugs and learn from each other.
 * We followed our work plan and made steady progress toward completing the project.
 * Different settings and configurations on our machines sometimes caused problems when combining our work.
 * We discussed how to make our development process more efficient in future projects.
 
   
-What is working well, what should we continue with:
+**What is working well, what should we continue with:**
 
 A : We maintained steady progress and good communication. Reviewing each other's code helped us understand the project requirements and learn from each other.
 
@@ -18,7 +18,7 @@ J : The team worked well together, and communication improved. Everyone became m
 
 Y : We helped each other, reviewed the code, and worked together to finish our user stories.
 
-What is slowing us down, what should we stop:
+**What is slowing us down, what should we stop:**
 
 A (Alve): Reviewing almost everything multiple times slowed down our progress, although it was useful for learning. Some project requirements also required us to work at a slower pace.
 
@@ -28,7 +28,7 @@ J : During the first week, Git and merging were new to many team members. Having
 
 Y : Overall, we worked well together and did not face any major problems. However, different settings took some time to sort out.
 
-What should we start doing:
+**What should we start doing:**
 
 A : We should gradually increase our development speed while maintaining good communication. We should also have clearer user stories and more structured acceptance criteria. We discussed doing more pair programming but did not follow up on it.
 
@@ -38,7 +38,7 @@ J : We should consider dividing work into more independent tasks and organizing 
 
 Y : In future projects, we should break larger user stories into smaller tasks from the beginning.
 
-Concrete changes / Suggested action items:
+**Concrete changes / Suggested action items:**
 
 * Break larger user stories into smaller, independent tasks at the beginning of the sprint.
   
