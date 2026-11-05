@@ -95,3 +95,8 @@ class CustomerDataExport(BaseModel):
 class CategoryRevenue(BaseModel):
     category: str
     revenue: float
+
+
+class CategoryInput(BaseModel):
+    name: Annotated[str, StringConstraints(
+        strip_whitespace=True, min_length=1, max_length=100)]

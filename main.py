@@ -8,6 +8,7 @@ from sqlite3 import IntegrityError, Error
 from fastapi import FastAPI, HTTPException, Header, Depends, Query, Path as FastApiPath
 from dotenv import load_dotenv
 import database
+from models import CategoryInput
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
 from receipt import Receipt_row, Receipt
 
@@ -217,3 +218,8 @@ def get_revenue():
     except Error as error:
         raise HTTPException(
             status_code=500, detail="Could not read revenue data") from error
+
+
+@app.post("/categories", dependencies=[Depends(require_api_key)])
+def post_category(category: CategoryInput):
+    return database.get_or_create_category(category.name)

@@ -314,3 +314,16 @@ def get_revenue_per_category():
         ).fetchall()
 
     return [dict(row) for row in rows]
+
+
+def get_or_create_category(name):
+    with connection() as conn:
+        conn.execute(
+            "INSERT INTO categories (name) VALUES (?) "
+            "ON CONFLICT(name) DO NOTHING", (name,)
+        )
+        row = conn.execute(
+            "SELECT category_id, name FROM categories WHERE name = ?",
+            (name,)
+        ).fetchone()
+        return dict(row)
