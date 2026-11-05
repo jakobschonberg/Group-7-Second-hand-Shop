@@ -94,6 +94,10 @@ def require_api_key(x_api_key: str | None = Header(default=None)):
 def get_customers():
     return database.list_customers()
 
+@app.get("/customers/no_orders", response_model=list[models.Customer], dependencies=[Depends(require_api_key)])
+def get_customers():
+    return database.list_customers_without_orders()
+
 
 @app.post("/customers", response_model=models.Customer, status_code=201,
           dependencies=[Depends(require_api_key)])

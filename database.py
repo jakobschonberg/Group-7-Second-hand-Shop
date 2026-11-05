@@ -5,12 +5,6 @@ from contextlib import contextmanager
 from os import getenv
 from datetime import datetime, timedelta
 from collections import defaultdict
-from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
-
-
-products = get_products_from_FakeStoreApi()
-categories = get_categories_from_FakeStoreApi()
-
 
 @contextmanager
 def connection():
@@ -230,8 +224,7 @@ def list_products_not_part_of_orders():
             SELECT p.product_id, p.name, c.name as category
             FROM products p
             JOIN categories c ON p.category_id = c.category_id
-            LEFT JOIN order_items oi ON oi.product_id = p.product_id
-            WHERE oi.product_id IS NULL OR NOT EXISTS (
+            WHERE NOT EXISTS (
                 SELECT 1 
                 FROM order_items oi
                 JOIN orders o ON oi.order_id = o.order_id 
@@ -242,6 +235,20 @@ def list_products_not_part_of_orders():
         ).fetchall()
 
         return [dict(product) for product in rows]
+
+
+def list_customers_without_orders():
+    with connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT c.customer_id, name, email, phone_no, city
+            FROM customers c
+            LEFT JOIN orders o ON o.customer_id = c.customer_id
+            WHERE o.customer_id IS NULL
+            ORDER BY c.customer_id
+            """
+        ).fetchall()
+        return [dict(customer) for customer in rows]
 
 
 def get_customer_full_data(customer_id: int):

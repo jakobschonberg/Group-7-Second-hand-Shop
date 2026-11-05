@@ -1,5 +1,5 @@
 from seed import reset_database
-from database import imported_products_to_db, list_products_not_part_of_orders
+from database import imported_products_to_db, list_products_not_part_of_orders, list_customers_without_orders
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 import sqlite3
 
@@ -7,11 +7,30 @@ menu = {
     1: ("Quit", "my_quit"),
     2: ("Import products and categories", "import_products_and_categories_from_FakeStoreApi"),
     3: ("Reset database (replaces data with test data)", "reset_test_data"),
-    4: ("List products that never been sold", "list_products_never_sold")
+    4: ("List products that never been sold", "list_products_never_sold"),
+    5: ("List customers without orders", "list_customers_with_no_orders")
 }
 
 def my_quit():
     pass
+
+def list_customers_with_no_orders():
+    try:
+        customers = list_customers_without_orders()
+    except sqlite3.Error as error:
+        print(f"Database Error: {error}")
+        return
+
+    if not customers:
+        print("No customers without orders found")
+        return
+
+    print(
+        f"{"customer_id":<13} {"customer name"}")
+
+    for customer in customers:
+        print(
+            f"{customer["customer_id"]:<13} {customer["name"]}")
 
 def list_products_never_sold():
     try:
