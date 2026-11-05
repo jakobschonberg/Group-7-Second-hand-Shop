@@ -7,20 +7,45 @@ from dotenv import load_dotenv
 from seed import reset_database
 from database import imported_products_to_db, list_products_not_part_of_orders
 from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
+load_dotenv()
 
+API_KEY = os.getenv("API_KEY")
+REST_API_URL = os.getenv("REST_API_URL", "127.0.0.1:8000")
 
 menu = {
     1: ("Quit", "my_quit"),
     2: ("Import products and categories", "import_products_and_categories_from_FakeStoreApi"),
     3: ("Reset database (replaces data with test data)", "reset_test_data"),
     4: ("List products that never been sold", "list_products_never_sold"),
-    5: ("Create product via API", "create_product_via_api")
+    5: ("List the revenue ordered by category", "fetch_revenue"),
+    6: ("Create product via API", "create_product_via_api")
 }
 
 
 def my_quit():
     pass
 
+def fetch_revenue():
+    url = f"http://{REST_API_URL}/reports/revenue"
+    headers = {"X-API-Key": API_KEY}
+
+    try:
+        response = requests.get(url, headers = headers, timeout = 2)
+
+        if response.status_code == 200:
+            data = response.json()
+            print("\n- Report: revenue per category -")
+            for row in data:
+                print(f"Category: {row['category']} | Revenue: ${row['revenue']} (USD)")
+            print("-------------------------------\n")
+        elif response.status_code == 401:
+            print("Error: incorrect or missing API-key.")
+        else:
+            print(f"Error: {response.status_code}: {response.text}")
+
+    except requests.exceptions.ConnectionError:
+        print(f"Could not connect to {REST_API_URL}. Is the server running?")
+    pass
 
 def import_products_and_categories_from_FakeStoreApi():
     products = get_products_from_FakeStoreApi()
