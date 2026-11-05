@@ -110,6 +110,9 @@ def list_products_page():
 
         products = products_page["products"]
         if not products:
+            if offset > 0:
+                offset = max(0, offset - PAGE_SIZE)
+                continue
             print("No products available in store now")
             return
 
