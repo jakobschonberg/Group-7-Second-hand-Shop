@@ -6,6 +6,7 @@ from models import Customer, CustomerInput, CreateProduct, UpdateProduct, Custom
 from secrets import compare_digest
 from sqlite3 import IntegrityError, Error
 from fastapi import FastAPI, HTTPException, Header, Depends, Query, Path as FastApiPath
+from models import OrderInput, OrderStatusUpdate
 from dotenv import load_dotenv
 import database
 from models import Customer, CustomerInput, CreateProduct, UpdateProduct, CategoryRevenue
@@ -209,6 +210,45 @@ def get_customer_data_export(customer_id: int):
         )
         
     return customer_data
+
+
+@app.get("/orders", dependencies=[Depends(require_api_key)])
+def get_orders(customer_id: int | None = Query(default=None, gt=0)):
+    try:
+        return database.list_orders(customer_id)
+    except LookupError as error:
+        raise HTTPException(404, str(error)) from error
+
+
+@app.get("/orders/{order_id}", dependencies=[Depends(require_api_key)])
+def get_order(order_id: int = FastApiPath(gt=0)):
+    order = database.get_order(order_id)
+    if order is None:
+        raise HTTPException(404, "Order not found")
+    return order
+
+
+@app.post("/orders", status_code=201,
+          dependencies=[Depends(require_api_key)])
+def post_order(order: OrderInput):
+    try:
+        return database.create_order(order.model_dump())
+    except LookupError as error:
+        raise HTTPException(404, str(error)) from error
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+
+
+@app.patch("/orders/{order_id}", dependencies=[Depends(require_api_key)])
+def patch_order(changes: OrderStatusUpdate, order_id: int = FastApiPath(gt=0)):
+    try:
+        return database.update_order_status(order_id, changes.status)
+    except LookupError as error:
+        raise HTTPException(404, str(error)) from error
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+
+
 
 
 @app.get("/reports/revenue", dependencies=[Depends(require_api_key)], response_model=list[CategoryRevenue])

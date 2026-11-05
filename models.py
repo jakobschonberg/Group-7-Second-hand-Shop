@@ -92,6 +92,23 @@ class CustomerDataExport(BaseModel):
     city: Optional[str] = None
     orders: List[OrderExport]
 
+class OrderItemInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    product_id: int = Field(gt=0, strict=True)
+    quantity: int = Field(gt=0, strict=True)
+
+
+class OrderInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    customer_id: int = Field(gt=0, strict=True)
+    items: list[OrderItemInput] = Field(min_length=1)
+
+
+class OrderStatusUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: Literal["NEW", "DELIVERED", "CANCELLED"]
+
+
 class CategoryRevenue(BaseModel):
     category: str
     revenue: float
