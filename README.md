@@ -63,7 +63,7 @@ For example: `/products?category=electronics&in_stock=true`.
 
 
 ## ER Diagram
-<img width="1036" height="637" alt="image" src="https://github.com/user-attachments/assets/c3ee89e6-a47a-4ba7-996f-02a17eef3aeb" />
+<img width="784" height="274" alt="Image" src="https://github.com/user-attachments/assets/5ed077dd-d570-4123-93a3-f5f81a647422" />
 
 ## Personal data
 Even though the store is fictional, in structuring the project we have tried to comply with GDPR principles of data minimization, the system only stores essential customer data required for order processing:
