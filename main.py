@@ -60,10 +60,10 @@ def get_products(name: str | None = Query(default=None, min_length=2),
             cat for cat in categories if category.lower() in cat["name"].lower()]
         rproducts = [product for product in rproducts if product["category_id"] in map(
             lambda d: d["category_id"], matching_categories)]
-    if minimum_price:
+    if minimum_price is not None:
         rproducts = [
             product for product in rproducts if product["price"] >= minimum_price]
-    if maximum_price:
+    if maximum_price is not None:
         rproducts = [
             product for product in rproducts if product["price"] <= maximum_price]
     if in_stock:
