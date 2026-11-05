@@ -18,7 +18,7 @@ menu = {
     3: ("Reset database (replaces data with test data)", "reset_test_data"),
     4: ("List products that never been sold", "list_products_never_sold"),
     5: ("List the revenue ordered by category", "fetch_revenue"),
-    6: ("Create product via API", "create_product_via_api")
+    7: ("Create product via API", "create_product_via_api")
 }
 
 
