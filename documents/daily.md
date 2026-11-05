@@ -96,3 +96,20 @@ Alve: Working on his current pull request and expects to finish today. Has one t
 Today’s Discussion: Discussed unit tests and importance in preventing future problems. Agreed to review the remaining project requirements and ensure everything is completed.
 
 Team Goal: Complete the remaining tasks today, review pull requests, and be prepared for Sprint Review 2 tomorrow.
+
+**Day 8**
+ 
+Jakob: Plans to reorganize the code.
+ 
+Alve and Sarany: Will go through the project requirements one more time to make sure we meet all requirements. Will also review the documentation and make any necessary final changes. And review the README documentation.
+ 
+Yetnayet: Will test the program and API endpoints to make sure everything works correctly after merging and that no functionality is broken or missing.
+ 
+Team Discussion and Decisions
+
+Jakob prepared a clear work schedule for the day, which helped us organize our tasks and manage our time effectively. We agreed to follow the schedule so everyone knew their responsibilities.
+ 
+Team Progress
+
+We followed Jakob's schedule, which helped us stay organized and focused on completing the remaining tasks. During the Daily Scrum, we discussed the final pull requests, documentation updates, and testing responsibilities.
+We agreed to prioritize reviewing and merging the remaining pull requests before continuing with our individual tasks. It also improved our teamwork and coordination as we prepared to finish the project and get ready for the final presentation.
