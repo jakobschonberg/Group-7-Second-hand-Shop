@@ -4,7 +4,6 @@ import sqlite3
 from pathlib import Path
 
 from dotenv import load_dotenv
-from decimal import Decimal
 
 CATEGORIES = [
     (1, 'Clothing'),
@@ -14,14 +13,14 @@ CATEGORIES = [
 
 ]
 PRODUCTS = [
-    (1, 1, 'White T-shirt', Decimal(50.0), 10),
-    (2, 1, 'Winter jacket', Decimal(250.0), 0),
-    (3, 2, 'USB keyboard', Decimal(80.0), 1),
-    (4, 2, 'Wired headphones', Decimal(0.0), 5),
-    (5, 3, 'Running shoes', Decimal(150.0), 3),
-    (6, 4, 'Scarf', Decimal(220.0), 3),
-    (7, 2, 'USB mouse', Decimal(99.99), 10),
-    (8, 2, 'Webcam', Decimal(99.97), 10),
+    (1, 1, 'White T-shirt', 50.0, 10),
+    (2, 1, 'Winter jacket', 250.0, 0),
+    (3, 2, 'USB keyboard', 80.0, 1),
+    (4, 2, 'Wired headphones', 0.0, 5),
+    (5, 3, 'Running shoes', 150.0, 3),
+    (6, 4, 'Scarf', 220.0, 3),
+    (7, 2, 'USB mouse', 99.99, 10),
+    (8, 2, 'Webcam', 99.97, 10),
 ]
 CUSTOMERS = [
     (1, 'Ada', 'ada@example.com', None, None),
@@ -42,18 +41,18 @@ ORDERS = [
 
 ]
 ORDER_ITEMS = [
-    (1, 1, Decimal(50.0), 1),
-    (2, 1, Decimal(45.0), 2),
-    (2, 2, Decimal(250.0), 1),
-    (3, 3, Decimal(80.0), 1),
-    (4, 4, Decimal(0.0), 1),
-    (5, 5, Decimal(150.0), 2),
-    (5, 6, Decimal(220.0), 3),
-    (6, 5, Decimal(150.0), 3),
-    (7, 6, Decimal(220.0), 1),
-    (8, 6, Decimal(220.0), 1),
-    (9, 7, Decimal(99.99), 2),
-    (9, 8, Decimal(99.98), 3),
+    (1, 1, 50.0, 1),
+    (2, 1, 45.0, 2),
+    (2, 2, 250.0, 1),
+    (3, 3, 80.0, 1),
+    (4, 4, 0.0, 1),
+    (5, 5, 150.0, 2),
+    (5, 6, 220.0, 3),
+    (6, 5, 150.0, 3),
+    (7, 6, 220.0, 1),
+    (8, 6, 220.0, 1),
+    (9, 7, 99.99, 2),
+    (9, 8, 99.98, 3),
 ]
 
 
