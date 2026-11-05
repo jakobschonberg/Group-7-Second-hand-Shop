@@ -1,3 +1,5 @@
+import shop_api_client
+import math
 import sqlite3
 import os
 import math
@@ -13,6 +15,7 @@ load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 REST_API_URL = os.getenv("REST_API_URL", "127.0.0.1:8000")
+PAGE_SIZE = 2
 
 menu = {
     1: ("Quit", "my_quit"),
@@ -20,6 +23,7 @@ menu = {
     3: ("Reset database (replaces data with test data)", "reset_test_data"),
     4: ("List products that never been sold", "list_products_never_sold"),
     5: ("List the revenue ordered by category", "fetch_revenue"),
+    6: ("List all products", "list_products_page"),
     7: ("Create product via API", "create_product_via_api")
 }
 
@@ -41,14 +45,15 @@ def fetch_revenue():
 
     print("\n--- Report: Revenue per category ---")
     for row in data:
-        print(f"Category: {row['category']} | Revenue: ${row['revenue']} (USD)")
+        print(
+            f"Category: {row['category']} | Revenue: ${row['revenue']} (USD)")
     print("------------------------------------\n")
+
+
 def import_products_and_categories_from_FakeStoreApi():
     products = get_products_from_FakeStoreApi()
     categories = get_categories_from_FakeStoreApi()
     imported_products_to_db(products, categories)
-    # TODO: check if we already have these products / categories in the database
-    # TODO: each product / category not already in database should be saved in database
 
 
 def reset_test_data():
@@ -134,15 +139,143 @@ def create_product_via_api():
             return
         response.raise_for_status()
         created = response.json()
-        print(f"Product created successfully. Product ID: {created['product_id']}")
+        print(
+            f"Product created successfully. Product ID: {created['product_id']}")
     except requests.HTTPError:
-        print(f"API request failed ({response.status_code}). Check your API key and product details.")
+        print(
+            f"API request failed ({response.status_code}). Check your API key and product details.")
     except requests.exceptions.JSONDecodeError:
         print("The API returned an unexpected response.")
     except requests.RequestException:
-        print("Could not contact the API. Check REST_API_URL and that the server is running.")
+        print(
+            "Could not contact the API. Check REST_API_URL and that the server is running.")
     except (ValueError, KeyError, TypeError, AttributeError):
         print("The API returned an unexpected response.")
+
+
+def list_products_page():
+    options = ["[N]ext", "[P]revious", "[Number] select", "[B]ack"]
+    offset = 0
+    while (True):
+        products_page = shop_api_client.get_products_page(PAGE_SIZE, offset)
+        if products_page is None:
+            print("Could not load the product. Please try again later")
+            return
+
+        total = products_page["total"]
+        total_pages = math.ceil(total/PAGE_SIZE)
+        current_page = offset // PAGE_SIZE + 1
+
+        products = products_page["products"]
+        if not products:
+            if offset > 0:
+                offset = max(0, offset - PAGE_SIZE)
+                continue
+            print("No products available in store now")
+            return
+
+        display_products_table(total_pages, current_page, products)
+
+        choice = input(" ".join(options) + ":").strip().lower()
+        if choice == "n":
+            has_next = offset + PAGE_SIZE < total
+            if (has_next):
+                offset = offset + PAGE_SIZE
+            else:
+                print("No next page")
+        elif choice == "p":
+            has_prev = offset > 0
+            if (has_prev):
+                offset = offset - PAGE_SIZE
+            else:
+                print("No Previous page")
+        elif choice.isdigit():
+            index = int(choice) - 1
+            if 0 <= index < len(products):
+                select_product(products[index])
+            else:
+                print("No product with that number")
+
+        elif choice == "b":
+            return
+        else:
+            print("Invalid choice")
+
+
+def display_products_table(total_pages, current_page, products):
+    print(f"Page {current_page} of {total_pages}")
+    print(
+        f"{"No":^5} {"Name":<50} {"Category":<20} {"Price":^10} {"Stock":^10}")
+    for line_item, product in enumerate(products, 1):
+        print(
+            f"{line_item:^5} {product["name"]:<50} {product["category_name"]:<20} {product["price"]:^10} {product["stock"]:^10}")
+
+
+def select_product(product):
+    print(f"Selected: {product["name"]} (price {product["price"]})")
+    options = ["[U]pdate price", "[D]elete", "[B]ack"]
+    choice = input(" ".join(options) + ":").strip().lower()
+
+    if choice == "u":
+        update_product_price(product)
+
+    elif choice == "d":
+        delete_selected_product(product)
+        return
+
+    elif choice == "b":
+        return
+    else:
+        print("Invalid choice")
+
+
+def update_product_price(product):
+    try:
+        new_price = float(input("Enter new price: ").strip())
+        if not math.isfinite(new_price) or new_price < 0:
+            raise ValueError
+    except ValueError:
+        print("Price must be 0 or more")
+        return
+
+    response = shop_api_client.change_price(
+        product["product_id"], new_price)
+
+    if response is None:
+        return
+    status_code = response.status_code
+    if status_code == 200:
+        print("Product updated successfully")
+    elif status_code == 404:
+        print("Product not found")
+    elif status_code == 401:
+        print("Unauthorized")
+    elif status_code == 422:
+        print("Invalid price")
+    else:
+        print("Product update not successful")
+
+
+def delete_selected_product(product):
+    confirm = input(
+        f"Do you really want to delete the product {product["name"]}. Type 'yes' to continue : ").strip().lower()
+    if confirm in ("yes", "y"):
+        response = shop_api_client.delete_product(product["product_id"])
+        if response is None:
+            return
+        status_code = response.status_code
+        if status_code == 204:
+            print("Product deleted successfully")
+        elif status_code == 404:
+            print("Product not found")
+        elif status_code == 401:
+            print("Unauthorized")
+        elif status_code == 409:
+            print("Product cannot be deleted. Related records exist")
+        else:
+            print("product deletion not successful")
+    else:
+        print("Delete Cancelled")
 
 
 def main():

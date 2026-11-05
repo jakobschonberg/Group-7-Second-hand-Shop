@@ -3,9 +3,10 @@ import sqlite3
 from pathlib import Path
 from contextlib import contextmanager
 import os
-from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
 from datetime import datetime, timedelta
 from collections import defaultdict
+from external_api import get_products_from_FakeStoreApi, get_categories_from_FakeStoreApi
+
 
 products = get_products_from_FakeStoreApi()
 categories = get_categories_from_FakeStoreApi()
@@ -241,10 +242,12 @@ def list_products_not_part_of_orders():
 
         return [dict(product) for product in rows]
 
+
 def get_customer_full_data(customer_id: int):
     with connection() as conn:
 
-        customer_row = conn.execute("SELECT * FROM customers WHERE customer_id = ?", (customer_id,)).fetchone()
+        customer_row = conn.execute(
+            "SELECT * FROM customers WHERE customer_id = ?", (customer_id,)).fetchone()
 
         if not customer_row:
             return None
@@ -255,13 +258,13 @@ def get_customer_full_data(customer_id: int):
             "SELECT order_id, status, order_date FROM orders WHERE customer_id = ?",
             (customer_id,)
         ).fetchall()
-        
+
         if not order_rows:
             customer_data["orders"] = []
             return customer_data
-            
+
         order_ids = [order["order_id"] for order in order_rows]
-        
+
         placeholders = ",".join("?" for order_id in order_ids)
         item_rows = conn.execute(
             f"""
@@ -273,16 +276,16 @@ def get_customer_full_data(customer_id: int):
             """,
             order_ids
         ).fetchall()
-        
+
         items_by_order = defaultdict(list)
-        
+
         for item in item_rows:
             items_by_order[item["order_id"]].append({
                 "name": item["name"],
                 "quantity": item["quantity"],
                 "unit_price": item["unit_price"]
             })
-            
+
         orders = []
         for order in order_rows:
             ord_id = order["order_id"]
@@ -292,10 +295,11 @@ def get_customer_full_data(customer_id: int):
                 "order_date": order["order_date"],
                 "items": items_by_order[ord_id]
             })
-            
+
         customer_data["orders"] = orders
-        
+
         return customer_data
+
 
 def read_order(conn, order_id):
     row = conn.execute(
