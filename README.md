@@ -55,8 +55,9 @@ Edge Case Handling (Mixed Orders):<br>
 In scenarios where a customer requests deletion and has a mix of orders—some older than 7 years and some newer—the system applies a hybrid approach to balance GDPR and BFL:
 
 The expired orders (older than 7 years) are permanently deleted to respect data minimization.
-
 The customer profile and any active orders (newer than 7 years) are pseudonymized rather than deleted, keeping the accounting records intact while stripping away the physical identity.
+
+In a real-world scenario, a script should be scheduled to run ever so often to check if there are orders older than 7 years, and automatically delete them, as well as saved customer data for customers lacking newer orders. 
 
 ## Project & Team Process
 To repeat ourselves: This is a group project by students attending the education "Python AI & ML system developer" provided by Lexicon. The project is an exercise in combining what has been included in the education so far. In the project we utilize tools such as python programming, SQL, API's. An important requirement to this project was to run it according to the praxis of Scrum and the doxa of Agile. This forces the group to work 'slow and steady' and take strategic choices from start, every single day and within every sprint while at the same time reevaluate often. <br> While the team, consisting of just four stundents, mainly took decisions out of respect to the socratic method and group consensus, some roles were required for the project to be in line with the praxis of scrum. For the first sprint, the product owner was Saranya and the scrum master was Alve. As of the second sprint, we switched up our roles and had Jakob as product owner and Yetnayet as scrum master.
