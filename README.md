@@ -23,12 +23,14 @@ Make sure you have Python installed on your system.
 ```pip install -r requirements.txt```
 6. Create the .env according to the structure shown in .env-example<br>
 ```API_KEY=your_key```
-```DATABASE_PATH=your_path```
-```REST_API_URL=your_path```
+```DATABASE_PATH=databases/shop.db```
+```REST_API_URL=127.0.0.1:8000```
 8. Seed the database
 ```python client.py``` (option 3 and type "yes")
 9. Start FastAPI and run client
 ```uvicorn main:app --reload``` or ```fastapi dev main.py```
+10. Run unit test
+```python -m unittest discover -s tests -v```
 
 ## API Endpoints
 
