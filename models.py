@@ -1,11 +1,7 @@
-from pydantic import BaseModel, Field, StringConstraints
-from pydantic import ConfigDict, EmailStr
-from typing import Annotated
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints, ConfigDict, EmailStr
 from pydantic.types import StringConstraints
-from typing import Annotated, Literal
+from typing import Annotated, Literal, List, Optional
 from decimal import Decimal
-from typing import List, Optional
 
 class Category(BaseModel):
     name: Annotated[str, StringConstraints(
