@@ -32,6 +32,33 @@ Make sure you have Python installed on your system.
 
 ## API Endpoints
 
+Start the API and open `http://127.0.0.1:8000/docs` to try the endpoints and see the request fields.
+For endpoints that require an API key, send your `.env` `API_KEY` value in the `X-API-Key` header.
+
+| Method | Endpoint | What it does | API key required |
+| --- | --- | --- | --- |
+| GET | `/products` | List, search, filter and sort products | No |
+| GET | `/products/{product_id}` | Show one product | No |
+| POST | `/products` | Create a product | Yes |
+| PATCH | `/products/{product_id}` | Update product details | Yes |
+| DELETE | `/products/{product_id}` | Delete a product if it has no related order items | Yes |
+| POST | `/categories` | Create a category or return an existing one with the same name | Yes |
+| GET | `/customers` | List customers | Yes |
+| POST | `/customers` | Create a customer | Yes |
+| PUT | `/customers/{customer_id}` | Update customer details | Yes |
+| DELETE | `/customers/{customer_id}` | Delete or pseudonymize a customer depending on their orders | Yes |
+| GET | `/customers/{customer_id}/data` | Export a customer's details and orders | Yes |
+| GET | `/orders` | List orders, optionally filtered by `customer_id` | Yes |
+| GET | `/orders/{order_id}` | Show one order and its items | Yes |
+| POST | `/orders` | Place an order and decrease stock | Yes |
+| PATCH | `/orders/{order_id}` | Update only the order status | Yes |
+| GET | `/orders/{order_id}/receipt` | Show the order receipt | Yes |
+| GET | `/reports/revenue` | Show revenue by category, excluding cancelled orders | Yes |
+
+`GET /products` accepts these optional query parameters: `name`, `category`,
+`minimum_price`, `maximum_price`, `in_stock`, `sort_by`, `order`, `limit` and `offset`.
+For example: `/products?category=electronics&in_stock=true`.
+
 
 ## ER Diagram
 <img width="1036" height="637" alt="image" src="https://github.com/user-attachments/assets/c3ee89e6-a47a-4ba7-996f-02a17eef3aeb" />
