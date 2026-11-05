@@ -4,9 +4,9 @@ import requests
 from external_api import get_request
 
 load_dotenv()
-REST_API_URL = getenv("REST_API_URL", "http://127.0.0.1:8000")
+REST_API_URL = getenv("REST_API_URL", "127.0.0.1:8000")
 API_KEY = getenv("API_KEY")
-PRODUCTS_URL = REST_API_URL + "/products"
+PRODUCTS_URL = "http://" + REST_API_URL + "/products"
 HEADERS = {"X-API-Key": API_KEY}
 
 
