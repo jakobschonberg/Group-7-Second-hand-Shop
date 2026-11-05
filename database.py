@@ -229,8 +229,9 @@ def list_products_not_part_of_orders():
             """
             SELECT p.product_id, p.name, c.name as category
             FROM products p
-            JOIN categories c ON p.category_id = c.category_id 
-            WHERE NOT EXISTS (
+            JOIN categories c ON p.category_id = c.category_id
+            LEFT JOIN order_items oi ON oi.product_id = p.product_id
+            WHERE oi.product_id IS NULL OR NOT EXISTS (
                 SELECT 1 
                 FROM order_items oi
                 JOIN orders o ON oi.order_id = o.order_id 
