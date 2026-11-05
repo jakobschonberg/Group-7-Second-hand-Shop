@@ -5,7 +5,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 CATEGORIES = [
     (1, 'Clothing'),
     (2, 'Electronics'),
@@ -20,6 +19,8 @@ PRODUCTS = [
     (4, 2, 'Wired headphones', 0.0, 5),
     (5, 3, 'Running shoes', 150.0, 3),
     (6, 4, 'Scarf', 220.0, 3),
+    (7, 2, 'USB mouse', 99.99, 10),
+    (8, 2, 'Webcam', 99.97, 10),
 ]
 CUSTOMERS = [
     (1, 'Ada', 'ada@example.com', None, None),
@@ -36,6 +37,7 @@ ORDERS = [
     (6, 4, 'DELIVERED', '2024-09-01'),
     (7, 3, 'DELIVERED', '2025-10-01'),
     (8, 3, 'CANCELLED', '2025-10-01'),
+    (9, 1, 'DELIVERED', '2020-04-01'),
 
 ]
 ORDER_ITEMS = [
@@ -49,6 +51,8 @@ ORDER_ITEMS = [
     (6, 5, 150.0, 3),
     (7, 6, 220.0, 1),
     (8, 6, 220.0, 1),
+    (9, 7, 99.99, 2),
+    (9, 8, 99.98, 3),
 ]
 
 

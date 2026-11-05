@@ -1,5 +1,5 @@
-from client_helper import get_request
 import requests
+from util import get_request
 
 
 def get_products_from_FakeStoreApi() -> list[dict]:
