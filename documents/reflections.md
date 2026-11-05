@@ -9,10 +9,15 @@ Role: Product Owner in Sprint 2.
 Main contributions:
 
 View Products (#3).
+
 Order receipts (#6).
+
 Rounding fixes (#35).
+
 Code reorganization (#43).
+
 Zero-price filter fix (#45).
+
 LEFT JOIN / IS NULL change (#48).
 
 Reorganize and improve the code structure.
@@ -24,9 +29,13 @@ Role: Scrum Master in Sprint 1.
 Main contributions:
 
 Import products without duplicates (#2).
+
 Customer deletion and pseudonymization.
+
 Customer data export (#26).
+
 Revenue through the API (#24).
+
 Shared request helper (#39).
 
 Review project requirements and help update README.md, requirements.txt, and documentation.
@@ -38,9 +47,13 @@ Role: Product Owner in Sprint 1.
 Main contributions:
 
 Database schema (#12).
+
 Product creation, updating, and deletion (#8).
+
 Products never sold (#9).
+
 Revenue calculation (#10).
+
 Listing, updating, and deleting products through the client API (#27).
 
 Review and update README.md, requirements.txt, and project documentation.
@@ -52,9 +65,13 @@ Role: Scrum Master in Sprint 2.
 Main contributions:
 
 Manage Customers (#7).
+
 Add database test data (#19).
+
 Place an Order (#5).
+
 Implement stock checks to prevent overbuying (#1).
+
 Create Products via API (#28).
 
 Test the merged program and API endpoints, report bugs, and document API endpoints.
