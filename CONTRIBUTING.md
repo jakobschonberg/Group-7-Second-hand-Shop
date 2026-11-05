@@ -1,14 +1,14 @@
-Definition of Done:
-• The acceptance criteria are met
-• Tested by hand in /docs, and in client.py if the client uses it
-• Follows our coding standard in CONTRIBUTING.md
-• Reviewed and approved by at least one other person
-• Merged to main, and main still runs
-• No keys or passwords in the code
+Definition of Done:<br>
+• The acceptance criteria are met <br>
+• Tested by hand in /docs, and in client.py if the client uses it<br>
+• Follows our coding standard in CONTRIBUTING.md<br>
+• Reviewed and approved by at least one other person<br>
+• Merged to main, and main still runs<br>
+• No keys or passwords in the code<br>
     
-Coding Standard:
-    PEP 8
+Coding Standard:<br>
+• PEP 8
 
-Branch names:
-    feature/feature_name
-    bugfix/bug_description
+Branch names:<br>
+• feature/feature_name<br>
+• bugfix/bug_description
