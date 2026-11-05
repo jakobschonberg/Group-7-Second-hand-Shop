@@ -1,26 +1,40 @@
-# Group-7-Second-hand-Shop
-The project is based on fictional paragraph:
+# ReLoop second-hand store
+This project is based on a fictional world built from just a sentence:
 "ReLoop sells second-hand clothes and electronics online. We want an API for products, customers and orders, and we want to import test products from a supplier's API instead of typing them in."
 
 The project is also steered by some technical requirements that we won't list here.
+
+We? Who? The *we* behind this project consists of a small group of students attending the educational program 'Python AI/ML developer'. More about this under the Project & Team process header.
 
 ## Product Goal
 Group 7 second hand shop app for managing lifecycle (viewing, purchasing, receipt and statistics) of second hand clothing and electronics products. Help shop administrator to help and manages product and owner to see revenue details.
 
 ## HOW TO RUN
-1. Clone the repo:<br>
-```git clone https://blablab```
-2. Navigate to the directory:<br>
-```cd blabal```
-3. Create virtual enviornment
-4. Install requirements
-5. Create the .env according to the structure shown in .env-example<br>
+Prerequisites
+Make sure you have Python installed on your system.
+
+1. Clone the repository:<br>
+```git clone https://github.com/jakobschonberg/Group-7-Second-hand-Shop.git```
+2. Navigate to the directory
+```cd Group-7-Second-hand-Shop```
+4. Create virtual environment (recommended)
+```python -m venv .venv``` 
+5. Install requirements
+```pip install -r requirements.txt```
+6. Create the .env according to the structure shown in .env-example<br>
 ```API_KEY=your_key```
 ```DATABASE_PATH=your_path```
-6. Seed the database
-7. Start FastAPI dev
+```REST_API_URL=your_path```
+8. Seed the database
+```python client.py``` (option 3 and type "yes")
+9. Start FastAPI and run client
+```uvicorn main:app --reload``` or ```fastapi dev main.py```
 
 ## API Endpoints
+
+
+## ER Diagram
+<img width="1036" height="637" alt="image" src="https://github.com/user-attachments/assets/c3ee89e6-a47a-4ba7-996f-02a17eef3aeb" />
 
 ## Personal data
 Even though the store is fictional, in structuring the project we have tried to comply with GDPR principles of data minimization, the system only stores essential customer data required for order processing:
@@ -44,12 +58,8 @@ The expired orders (older than 7 years) are permanently deleted to respect data 
 
 The customer profile and any active orders (newer than 7 years) are pseudonymized rather than deleted, keeping the accounting records intact while stripping away the physical identity.
 
-## ER Diagram
-<img width="1036" height="637" alt="image" src="https://github.com/user-attachments/assets/c3ee89e6-a47a-4ba7-996f-02a17eef3aeb" />
-
-
 ## Project & Team Process
-This is a group project for the educational programme called "Python AI & ML system developer" provided by Lexicon. The project is an exercise in combining what has been included in the education so far. In the project we utilize tools such as python programming, SQL, API's. An important requirement to this project was to run it according to the praxis of Scrum and the doxa of Agile development philosophy. This forces the group to work 'slow and steady' and take strategic choices from start, every single day and within every sprint while at the same time reevaluate often. <br> While the team, a gang of four, mainly took decisions out of respect to the socratic method and consensus, some roles were required for the project to be in line with the praxis of scrum. For the first sprint, the product owner was Saranya and the scrum master was Alve. As of the second sprint, we switched up our roles and had Jakob as product owner and Yetnayet as scrum master.
+To repeat ourselves: This is a group project by students attending the education "Python AI & ML system developer" provided by Lexicon. The project is an exercise in combining what has been included in the education so far. In the project we utilize tools such as python programming, SQL, API's. An important requirement to this project was to run it according to the praxis of Scrum and the doxa of Agile. This forces the group to work 'slow and steady' and take strategic choices from start, every single day and within every sprint while at the same time reevaluate often. <br> While the team, consisting of just four stundents, mainly took decisions out of respect to the socratic method and group consensus, some roles were required for the project to be in line with the praxis of scrum. For the first sprint, the product owner was Saranya and the scrum master was Alve. As of the second sprint, we switched up our roles and had Jakob as product owner and Yetnayet as scrum master.
 
 ## Create or reset test data
 
